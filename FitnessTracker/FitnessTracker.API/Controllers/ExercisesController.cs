@@ -2,6 +2,7 @@
 using FitnessTracker.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using FitnessTracker.Application.Interfaces;
 
 namespace FitnessTracker.API.Controllers
 {
@@ -9,34 +10,39 @@ namespace FitnessTracker.API.Controllers
     [ApiController]
     public class ExercisesController : ControllerBase
     {
-        private readonly FitnessTrackerDbContext _context;
+        private readonly IExerciseService _exerciseService;
 
-        public ExercisesController(FitnessTrackerDbContext context)
+        public ExercisesController(IExerciseService exerciseService)
         {
-            _context = context;
+            _exerciseService = exerciseService;
         }
 
         // GET: api/Exercises
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Exercise>>> GetExercises()
         {
-            // SELECT * FROM exercises
-            var exercises = await _context.Exercises.ToListAsync();
-            return Ok(exercises);
+            var result = await _exerciseService.GetAllAsync();
+
+            if (!result.IsSuccess)
+            {
+                return BadRequest(result.Error);
+            }
+
+            return Ok(result.Value);
         }
 
         // GET: api/Exercises/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Exercise>> GetExercise(int id)
         {
-            var exercise = await _context.Exercises.FindAsync(id);
+            var result = await _exerciseService.GetByIdAsync(id);
 
-            if (exercise == null)
+            if (!result.IsSuccess)
             {
-                return NotFound();
+                return BadRequest(result.Error);
             }
 
-            return exercise;
+            return Ok(result.Value);
         }
 
         // PUT: api/Exercises/5
@@ -44,28 +50,16 @@ namespace FitnessTracker.API.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutExercise(int id, Exercise exercise)
         {
-            if (id != exercise.Id)
-            {
-                //return BadRequest();
-                return BadRequest("Invalid Record Id");
-            }
+            var result = await _exerciseService.UpdateAsync(id, exercise);
 
-            _context.Entry(exercise).State = EntityState.Modified;
+            if (!result.IsSuccess)
+            {
+                if (result.Error == "Exercise not found.")
+                {
+                    return NotFound(result.Error);
+                }
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ExerciseExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return BadRequest(result.Error);
             }
 
             return NoContent();
@@ -76,31 +70,42 @@ namespace FitnessTracker.API.Controllers
         [HttpPost]
         public async Task<ActionResult<Exercise>> PostExercise(Exercise exercise)
         {
-            _context.Exercises.Add(exercise);
-            await _context.SaveChangesAsync();
+            var result = await _exerciseService.CreateAsync(exercise);
 
-            return CreatedAtAction("GetExercise", new { id = exercise.Id }, exercise);
+            if (!result.IsSuccess)
+            {
+                return BadRequest(result.Error);
+            }
+
+            return CreatedAtAction(
+                "GetExercise", 
+                new { id = exercise.Id }, 
+                result.Value
+                );
         }
 
         // DELETE: api/Exercises/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteExercise(int id)
         {
-            var exercise = await _context.Exercises.FindAsync(id);
-            if (exercise == null)
-            {
-                return NotFound();
-            }
+            var result = await _exerciseService.DeleteAsync(id);
 
-            _context.Exercises.Remove(exercise);
-            await _context.SaveChangesAsync();
+            if (!result.IsSuccess)
+            {
+                if (result.Error == "Exercise not found.")
+                {
+                    return NotFound(result.Error);
+                }
+
+                return BadRequest(result.Error);
+            }
 
             return NoContent();
         }
 
-        private bool ExerciseExists(int id)
-        {
-            return _context.Exercises.Any(e => e.Id == id);
-        }
+        //private bool ExerciseExists(int id)
+        //{
+        //    return _context.Exercises.Any(e => e.Id == id);
+        //}
     }
 }
