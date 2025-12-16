@@ -100,10 +100,5 @@ namespace FitnessTracker.API.Controllers
 
             return NoContent();
         }
-
-        //private bool ExerciseExists(int id)
-        //{
-        //    return _context.Exercises.Any(e => e.Id == id);
-        //}
     }
 }
