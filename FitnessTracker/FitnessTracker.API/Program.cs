@@ -1,4 +1,7 @@
-using FitnessTracker.API.Data;
+using FitnessTracker.Application.Interfaces;
+using FitnessTracker.Application.Services;
+using FitnessTracker.Infrastructure.Data;
+using FitnessTracker.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
@@ -11,6 +14,9 @@ builder.Services.AddDbContext<FitnessTrackerDbContext>(options =>
 {
     options.UseSqlServer(connectionString);
 });
+
+builder.Services.AddScoped<IExerciseRepository, ExerciseRepository>();
+builder.Services.AddScoped<IExerciseService, ExerciseService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
