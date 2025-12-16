@@ -40,9 +40,4 @@ public class ExerciseRepository : IExerciseRepository
         _context.Exercises.Remove(exercise);
         await _context.SaveChangesAsync();
     }
-
-    public bool ExerciseExists(int id)
-    {
-        return _context.Exercises.Any(e => e.Id == id);
-    }
 }

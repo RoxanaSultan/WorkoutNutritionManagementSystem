@@ -10,5 +10,4 @@ public interface IExerciseService
     Task<Result<Exercise>> CreateAsync(Exercise exercise);
     Task<Result<Exercise>> UpdateAsync(int id, Exercise exercise);
     Task<Result<Exercise>> DeleteAsync(int id);
-    bool ExerciseExists(int id);
 }

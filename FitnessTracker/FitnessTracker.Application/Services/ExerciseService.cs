@@ -31,11 +31,6 @@ public class ExerciseService : IExerciseService
         return Result<Exercise>.Success(exercise);
     }
 
-    public bool ExerciseExists(int id)
-    {
-        return _exerciseRepository.ExerciseExists(id);
-    }
-
     public async Task<Result<IEnumerable<Exercise>>> GetAllAsync()
     {
         var exercises = await _exerciseRepository.GetAllAsync();

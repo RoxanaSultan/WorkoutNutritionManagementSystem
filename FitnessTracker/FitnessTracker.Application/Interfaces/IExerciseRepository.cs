@@ -9,5 +9,4 @@ public interface IExerciseRepository
     Task CreateAsync(Exercise exercise);
     Task UpdateAsync(Exercise exercise);
     Task DeleteAsync(Exercise exercise);
-    bool ExerciseExists(int id);
 }

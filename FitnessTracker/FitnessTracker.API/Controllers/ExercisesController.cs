@@ -1,8 +1,6 @@
-﻿using FitnessTracker.Infrastructure.Data;
+﻿using FitnessTracker.Application.Interfaces;
 using FitnessTracker.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using FitnessTracker.Application.Interfaces;
 
 namespace FitnessTracker.API.Controllers
 {
