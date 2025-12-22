@@ -1,69 +1,92 @@
-﻿using FitnessTracker.Application.Interfaces;
+﻿using AutoMapper;
+using FitnessTracker.Application.DTOs.User;
+using FitnessTracker.Application.Interfaces;
 using FitnessTracker.Application.Results;
+using FitnessTracker.Application.Services.Validators;
 using FitnessTracker.Domain.Entities;
 
 namespace FitnessTracker.Application.Services;
 
-public class UserService : GenericService<User>, IUserService
+public class UserService : IUserService
 {
-    //private readonly IUserRepository _userRepository;
-    public UserService(IUserRepository userRepository)
-        : base(userRepository)
+    private readonly IUserRepository _userRepository;
+    private readonly IMapper _mapper;
+    private readonly IUserServiceValidator _userServiceValidator;
+
+    public UserService(IUserRepository userRepository, IMapper mapper, IUserServiceValidator userServiceValidator)
     {
-        //_userRepository = userRepository;
+        _userRepository = userRepository;
+        _mapper = mapper;
+        _userServiceValidator = userServiceValidator;
     }
 
-    //public async Task<Result<User>> CreateAsync(User user)
-    //{
-    //    await _userRepository.CreateAsync(user);
-    //    return Result<User>.Success(user);
-    //}
+    public async Task<Result<IEnumerable<UserDto>>> GetAllAsync()
+    {
+        var users = await _userRepository.GetAllAsync();
+        var usersDto = _mapper.Map<IEnumerable<UserDto>>(users);
 
-    //public async Task<Result<User>> DeleteAsync(int id)
-    //{
-    //    var user = await _userRepository.GetByIdAsync(id);
+        return Result<IEnumerable<UserDto>>.Ok(usersDto);
+    }
 
-    //    if (user == null)
-    //    {
-    //        return Result<User>.Failure("User not found.");
-    //    }
+    public async Task<Result<UserDto>> GetByIdAsync(int id)
+    {
+        var user = await _userRepository.GetByIdAsync(id);
 
-    //    await _userRepository.DeleteAsync(user);
-    //    return Result<User>.Success(user);
-    //}
+        if (user == null)
+            return Result<UserDto>.Fail("User not found.");
 
-    //public async Task<Result<IEnumerable<User>>> GetAllAsync()
-    //{
-    //    var users = await _userRepository.GetAllAsync();
-    //    return Result<IEnumerable<User>>.Success(users);
-    //}
+        var userDto = _mapper.Map<UserDto>(user);
+        return Result<UserDto>.Ok(userDto);
+    }
 
-    //public async Task<Result<User>> GetByIdAsync(int id)
-    //{
-    //    var user = await _userRepository.GetByIdAsync(id);
+    public async Task<Result<UserDto>> CreateAsync(CreateUserDto createUserDto)
+    {
+        var validationResult = await _userServiceValidator.ValidateCreateUserAsync(createUserDto.Email);
 
-    //    if (user == null)
-    //    {
-    //        return Result<User>.Failure("User not found.");
-    //    }
+        if (!validationResult.Success)
+        {
+            return Result<UserDto>.Fail(validationResult.Error!);
+        }
 
-    //    return Result<User>.Success(user);
-    //}
+        var user = _mapper.Map<User>(createUserDto);
+        await _userRepository.CreateAsync(user);
 
-    //public async Task<Result<User>> UpdateAsync(int id, User user)
-    //{
-    //    if (id != user.Id)
-    //    {
-    //        return Result<User>.Failure("Id mismatch.");
-    //    }
+        var userDto = _mapper.Map<UserDto>(user);
+        return Result<UserDto>.Ok(userDto);
+    }
 
-    //    var existingUser = await _userRepository.GetByIdAsync(id);
-    //    if (existingUser == null)
-    //    {
-    //        return Result<User>.Failure("User not found.");
-    //    }
+    public async Task<Result<UserDto>> UpdateAsync(int id, UpdateUserDto updateUserDto)
+    {
+        var existingUser = await _userRepository.GetByIdAsync(id);
 
-    //    await _userRepository.UpdateAsync(user);
-    //    return Result<User>.Success(user);
-    //}
+        if (existingUser == null)
+        {
+            return Result<UserDto>.Fail("User not found.");
+        }
+
+        var validationResult = await _userServiceValidator.ValidateUpdateUserAsync(id, updateUserDto.Email);
+
+        if (!validationResult.Success)
+        {
+            return Result<UserDto>.Fail(validationResult.Error!);
+        }
+
+        _mapper.Map(updateUserDto, existingUser);
+        await _userRepository.UpdateAsync(existingUser);
+
+        var userDto = _mapper.Map<UserDto>(existingUser);
+        return Result<UserDto>.Ok(userDto);
+    }
+
+    public async Task<Result<UserDto>> DeleteAsync(int id)
+    {
+        var user = await _userRepository.GetByIdAsync(id);
+        if (user == null)
+            return Result<UserDto>.Fail("User not found.");
+
+        await _userRepository.DeleteAsync(id);
+
+        var userDto = _mapper.Map<UserDto>(user);
+        return Result<UserDto>.Ok(userDto);
+    }
 }
