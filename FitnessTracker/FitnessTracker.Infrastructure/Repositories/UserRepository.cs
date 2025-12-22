@@ -1,43 +1,28 @@
 ﻿using FitnessTracker.Application.Interfaces;
 using FitnessTracker.Domain.Entities;
 using FitnessTracker.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace FitnessTracker.Infrastructure.Repositories;
 
 public class UserRepository : GenericRepository<User>, IUserRepository
 {
-    //private readonly FitnessTrackerDbContext _context;
+    private readonly FitnessTrackerDbContext _context;
     public UserRepository(FitnessTrackerDbContext context)
         : base(context)
     {
-        //_context = context;
+        _context = context;
     }
 
-    //public async Task<IEnumerable<User>> GetAllAsync()
-    //{
-    //    return await _context.Users.ToListAsync();
-    //}
 
-    //public async Task<User?> GetByIdAsync(int id)
-    //{
-    //    return await _context.Users.FindAsync(id);
-    //}
+    public async Task<bool> ExistsByEmailAsync(string email)
+    {
+        return await _context.Users.AnyAsync(u => u.Email == email);
+    }
 
-    //public async Task CreateAsync(User user)
-    //{
-    //    _context.Users.Add(user);
-    //    await _context.SaveChangesAsync();
-    //}
-
-    //public async Task UpdateAsync(User user)
-    //{
-    //    _context.Entry(user).State = EntityState.Modified;
-    //    await _context.SaveChangesAsync();
-    //}
-
-    //public async Task DeleteAsync(User user)
-    //{
-    //    _context.Users.Remove(user);
-    //    await _context.SaveChangesAsync();
-    //}
+    public async Task<bool> ExistsByEmailExceptUserIdAsync(string email, int userId)
+    {
+        return await _context.Users
+            .AnyAsync(u => u.Email == email && u.Id != userId);
+    }
 }
