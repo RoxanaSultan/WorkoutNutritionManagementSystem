@@ -1,12 +1,20 @@
-﻿using FitnessTracker.Domain.Entities;
+﻿using FitnessTracker.Application.DTOs.Workout;
+using FitnessTracker.Application.DTOs.WorkoutExercise;
+using FitnessTracker.Application.Results;
+using FitnessTracker.Domain.Entities;
 
 namespace FitnessTracker.Application.Interfaces;
 
-public interface IWorkoutService : IGenericService<Workout>
+public interface IWorkoutService
 {
-    //Task<Result<IEnumerable<Workout>>> GetAllAsync();
-    //Task<Result<Workout>> GetByIdAsync(int id);
-    //Task<Result<Workout>> CreateAsync(Workout workout);
-    //Task<Result<Workout>> UpdateAsync(int id, Workout workout);
-    //Task<Result<Workout>> DeleteAsync(int id);
+    Task<Result<IEnumerable<WorkoutDto>>> GetAllAsync();
+    Task<Result<WorkoutDto>> GetByIdAsync(int id);
+    Task<Result<WorkoutDto>> CreateAsync(CreateWorkoutDto createWorkoutDto);
+    Task<Result<WorkoutDto>> UpdateAsync(int id, UpdateWorkoutDto updateWorkoutDto);
+    Task<Result<WorkoutDto>> DeleteAsync(int id);
+
+    Task<Result<IEnumerable<WorkoutExerciseDto>>> GetExercisesByWorkout(int workoutId);
+    Task<Result> AddExerciseAsync(int workoutId, CreateWorkoutExerciseDto dto);
+    Task<Result> UpdateExerciseAsync(int workoutId, int exerciseId, UpdateWorkoutExerciseDto dto);
+    Task<Result> RemoveExerciseAsync(int workoutId, int exerciseId);
 }

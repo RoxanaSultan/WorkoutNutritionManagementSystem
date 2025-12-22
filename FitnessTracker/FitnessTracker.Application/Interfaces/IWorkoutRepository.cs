@@ -4,9 +4,13 @@ namespace FitnessTracker.Application.Interfaces;
 
 public interface IWorkoutRepository : IGenericRepository<Workout>
 {
-    //Task<IEnumerable<Workout>> GetAllAsync();
-    //Task<Workout?> GetByIdAsync(int id);
-    //Task CreateAsync(Workout workout);
-    //Task UpdateAsync(Workout workout);
-    //Task DeleteAsync(Workout workout);
+    Task<bool> ExistsSameStartTimeAsync(int userId, DateTime dateToMinute, int? ignoreWorkoutId = null);
+
+    Task<Workout?> GetByIdWithExercisesAsync(int id);
+    Task<bool> WorkoutExerciseExistsAsync(int workoutId, int exerciseId);
+    Task<IEnumerable<WorkoutExercise>> GetWorkoutExercisesByWorkoutIdAsync(int workoutId);
+    Task AddWorkoutExerciseAsync(WorkoutExercise workoutExercise);
+    Task<WorkoutExercise?> GetWorkoutExerciseAsync(int workoutId, int exerciseId);
+    Task UpdateWorkoutExerciseAsync(WorkoutExercise entity);
+    Task RemoveWorkoutExerciseAsync(WorkoutExercise workoutExercise);
 }

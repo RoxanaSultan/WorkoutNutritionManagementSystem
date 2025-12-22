@@ -1,12 +1,13 @@
-﻿using FitnessTracker.Domain.Entities;
+﻿using FitnessTracker.Application.DTOs.FoodItem;
+using FitnessTracker.Application.Results;
 
 namespace FitnessTracker.Application.Interfaces;
 
-public interface IFoodItemService : IGenericService<FoodItem>
+public interface IFoodItemService
 {
-    //Task<Result<IEnumerable<FoodItem>>> GetAllAsync();
-    //Task<Result<FoodItem>> GetByIdAsync(int id);
-    //Task<Result<FoodItem>> CreateAsync(FoodItem foodItem);
-    //Task<Result<FoodItem>> UpdateAsync(int id, FoodItem foodItem);
-    //Task<Result<FoodItem>> DeleteAsync(int id);
+    Task<Result<IEnumerable<FoodItemDto>>> GetAllAsync();
+    Task<Result<FoodItemDto>> GetByIdAsync(int id);
+    Task<Result<FoodItemDto>> CreateAsync(CreateFoodItemDto createDto);
+    Task<Result<FoodItemDto>> UpdateAsync(int id, UpdateFoodItemDto updateDto);
+    Task<Result<FoodItemDto>> DeleteAsync(int id);
 }
