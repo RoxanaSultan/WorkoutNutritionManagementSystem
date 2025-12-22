@@ -1,8 +1,6 @@
-﻿using FitnessTracker.Application.Interfaces;
-using FitnessTracker.Application.Services;
-using FitnessTracker.Domain.Entities;
+﻿using FitnessTracker.Application.DTOs.Goal;
+using FitnessTracker.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace FitnessTracker.API.Controllers;
 
@@ -19,40 +17,24 @@ public class GoalsController : ControllerBase
 
     // GET: api/Goals
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Goal>>> GetGoals()
+    public async Task<ActionResult<IEnumerable<GoalDto>>> GetGoals()
     {
         var result = await _goalService.GetAllAsync();
-
-        if (!result.IsSuccess)
+        if (!result.Success)
         {
             return BadRequest(result.Error);
         }
 
-        return Ok(result.Value);
+        return Ok(result.Data);
     }
 
     // GET: api/Goals/5
     [HttpGet("{id}")]
-    public async Task<ActionResult<Goal>> GetGoal(int id)
+    public async Task<ActionResult<GoalDto>> GetGoal(int id)
     {
         var result = await _goalService.GetByIdAsync(id);
 
-        if (!result.IsSuccess)
-        {
-            return BadRequest(result.Error);
-        }
-
-        return Ok(result.Value);
-    }
-
-    // PUT: api/Goals/5
-    // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-    [HttpPut("{id}")]
-    public async Task<IActionResult> PutGoal(int id, Goal goal)
-    {
-        var result = await _goalService.UpdateAsync(id, goal);
-
-        if (!result.IsSuccess)
+        if (!result.Success)
         {
             if (result.Error == "Goal not found.")
             {
@@ -62,25 +44,45 @@ public class GoalsController : ControllerBase
             return BadRequest(result.Error);
         }
 
-        return NoContent();
+        return Ok(result.Data);
+    }
+
+    // PUT: api/Goals/5
+    // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+    [HttpPut("{id}")]
+    public async Task<IActionResult> PutGoal(int id, UpdateGoalDto updateGoalDto)
+    {
+        var result = await _goalService.UpdateAsync(id, updateGoalDto);
+        if (!result.Success)
+        {
+            if (result.Error == "Goal not found.")
+            {
+                return NotFound(result.Error);
+            }
+
+            return BadRequest(result.Error);
+        }
+
+        return Ok(result.Data);
     }
 
     // POST: api/Goals
     // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
     [HttpPost]
-    public async Task<ActionResult<Goal>> PostGoal(Goal goal)
+    public async Task<ActionResult<GoalDto>> PostGoal(CreateGoalDto createGoalDto)
     {
-        var result = await _goalService.CreateAsync(goal);
-
-        if (!result.IsSuccess)
+        var result = await _goalService.CreateAsync(createGoalDto);
+        if (!result.Success)
         {
             return BadRequest(result.Error);
         }
 
+        var createdGoal = result.Data;
+
         return CreatedAtAction(
             nameof(GetGoal),
-            new { id = goal.Id },
-            result.Value
+            new { id = createdGoal!.Id },
+            createdGoal
         );
     }
 
@@ -89,8 +91,7 @@ public class GoalsController : ControllerBase
     public async Task<IActionResult> DeleteGoal(int id)
     {
         var result = await _goalService.DeleteAsync(id);
-
-        if (!result.IsSuccess)
+        if (!result.Success)
         {
             if (result.Error == "Goal not found.")
             {

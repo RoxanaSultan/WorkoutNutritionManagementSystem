@@ -1,5 +1,5 @@
-﻿using FitnessTracker.Application.Interfaces;
-using FitnessTracker.Domain.Entities;
+﻿using FitnessTracker.Application.DTOs.MeasurementLog;
+using FitnessTracker.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FitnessTracker.API.Controllers;
@@ -8,92 +8,72 @@ namespace FitnessTracker.API.Controllers;
 [ApiController]
 public class MeasurementLogsController : ControllerBase
 {
-    private readonly IMeasurementLogService _measurementLogService;
+    private readonly IMeasurementLogService _service;
 
-    public MeasurementLogsController(IMeasurementLogService measurementLogService)
+    public MeasurementLogsController(IMeasurementLogService service)
     {
-        _measurementLogService = measurementLogService;
+        _service = service;
     }
 
-    // GET: api/MeasurementLogs
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<MeasurementLog>>> GetMeasurementLogs()
+    public async Task<ActionResult<IEnumerable<MeasurementLogDto>>> GetMeasurementLogs()
     {
-        var result = await _measurementLogService.GetAllAsync();
-
-        if (!result.IsSuccess)
-        {
-            return BadRequest(result.Error);
-        }
-
-        return Ok(result.Value);
+        var result = await _service.GetAllAsync();
+        if (!result.Success) return BadRequest(result.Error);
+        return Ok(result.Data);
     }
 
-    // GET: api/MeasurementLogs/5
     [HttpGet("{id}")]
-    public async Task<ActionResult<MeasurementLog>> GetMeasurementLog(int id)
+    public async Task<ActionResult<MeasurementLogDto>> GetMeasurementLog(int id)
     {
-        var result = await _measurementLogService.GetByIdAsync(id);
+        var result = await _service.GetByIdAsync(id);
 
-        if (!result.IsSuccess)
-        {
-            return BadRequest(result.Error);
-        }
-
-        return Ok(result.Value);
-    }
-
-    // PUT: api/MeasurementLogs/5
-    // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-    [HttpPut("{id}")]
-    public async Task<IActionResult> PutMeasurementLog(int id, MeasurementLog measurementLog)
-    {
-        var result = await _measurementLogService.UpdateAsync(id, measurementLog);
-
-        if (!result.IsSuccess)
+        if (!result.Success)
         {
             if (result.Error == "Measurement log not found.")
-            {
                 return NotFound(result.Error);
-            }
 
             return BadRequest(result.Error);
         }
 
-        return NoContent();
+        return Ok(result.Data);
     }
 
-    // POST: api/MeasurementLogs
-    // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
     [HttpPost]
-    public async Task<ActionResult<MeasurementLog>> PostMeasurementLog(MeasurementLog measurementLog)
+    public async Task<ActionResult<MeasurementLogDto>> PostMeasurementLog(CreateMeasurementLogDto dto)
     {
-        var result = await _measurementLogService.CreateAsync(measurementLog);
+        var result = await _service.CreateAsync(dto);
+        if (!result.Success) return BadRequest(result.Error);
 
-        if (!result.IsSuccess)
+        var created = result.Data!;
+        return CreatedAtAction(nameof(GetMeasurementLog), new { id = created.Id }, created);
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> PutMeasurementLog(int id, UpdateMeasurementLogDto dto)
+    {
+        var result = await _service.UpdateAsync(id, dto);
+
+        if (!result.Success)
         {
+            if (result.Error == "Measurement log not found.")
+                return NotFound(result.Error);
+
             return BadRequest(result.Error);
         }
 
-        return CreatedAtAction(
-            nameof(GetMeasurementLog),
-            new { id = measurementLog.Id },
-            result.Value
-        );
+        return Ok(result.Data);
     }
 
-    // DELETE: api/MeasurementLogs/5
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteMeasurementLog(int id)
     {
-        var result = await _measurementLogService.DeleteAsync(id);
+        var result = await _service.DeleteAsync(id);
 
-        if (!result.IsSuccess)
+        if (!result.Success)
         {
             if (result.Error == "Measurement log not found.")
-            {
                 return NotFound(result.Error);
-            }
 
             return BadRequest(result.Error);
         }

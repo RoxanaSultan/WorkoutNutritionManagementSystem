@@ -1,102 +1,83 @@
-﻿using FitnessTracker.Application.Interfaces;
-using FitnessTracker.Domain.Entities;
+﻿using FitnessTracker.Application.DTOs.FoodItem;
+using FitnessTracker.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
-namespace FitnessTracker.API.Controllers
+namespace FitnessTracker.API.Controllers;
+
+[Route("api/[controller]")]
+[ApiController]
+public class FoodItemsController : ControllerBase
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class FoodItemsController : ControllerBase
+    private readonly IFoodItemService _foodItemService;
+
+    public FoodItemsController(IFoodItemService foodItemService)
     {
-        private readonly IFoodItemService _foodItemService;
+        _foodItemService = foodItemService;
+    }
 
-        public FoodItemsController(IFoodItemService foodItemService)
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<FoodItemDto>>> GetFoodItems()
+    {
+        var result = await _foodItemService.GetAllAsync();
+        if (!result.Success) return BadRequest(result.Error);
+        return Ok(result.Data);
+    }
+
+    [HttpGet("{id}")]
+    public async Task<ActionResult<FoodItemDto>> GetFoodItem(int id)
+    {
+        var result = await _foodItemService.GetByIdAsync(id);
+
+        if (!result.Success)
         {
-            _foodItemService = foodItemService;
+            if (result.Error == "Food item not found.")
+                return NotFound(result.Error);
+
+            return BadRequest(result.Error);
         }
 
-        // GET: api/FoodItems
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<FoodItem>>> GetFoodItems()
+        return Ok(result.Data);
+    }
+
+    [HttpPost]
+    public async Task<ActionResult<FoodItemDto>> PostFoodItem(CreateFoodItemDto createDto)
+    {
+        var result = await _foodItemService.CreateAsync(createDto);
+        if (!result.Success) return BadRequest(result.Error);
+
+        var created = result.Data!;
+        return CreatedAtAction(nameof(GetFoodItem), new { id = created.Id }, created);
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> PutFoodItem(int id, UpdateFoodItemDto updateDto)
+    {
+        var result = await _foodItemService.UpdateAsync(id, updateDto);
+
+        if (!result.Success)
         {
-            var result = await _foodItemService.GetAllAsync();
+            if (result.Error == "Food item not found.")
+                return NotFound(result.Error);
 
-            if (!result.IsSuccess)
-            {
-                return BadRequest(result.Error);
-            }
-
-            return Ok(result.Value);
+            return BadRequest(result.Error);
         }
 
-        // GET: api/FoodItems/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<FoodItem>> GetFoodItem(int id)
+        return Ok(result.Data);
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteFoodItem(int id)
+    {
+        var result = await _foodItemService.DeleteAsync(id);
+
+        if (!result.Success)
         {
-            var result = await _foodItemService.GetByIdAsync(id);
+            if (result.Error == "Food item not found.")
+                return NotFound(result.Error);
 
-            if (!result.IsSuccess)
-            {
-                return BadRequest(result.Error);
-            }
-
-            return Ok(result.Value);
+            return BadRequest(result.Error);
         }
 
-        // PUT: api/FoodItems/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutFoodItem(int id, FoodItem foodItem)
-        {
-            var result = await _foodItemService.UpdateAsync(id, foodItem);
-
-            if (!result.IsSuccess)
-            {
-                if (result.Error == "Food item not found.")
-                {
-                    return NotFound(result.Error);
-                }
-
-                return BadRequest(result.Error);
-            }
-
-            return NoContent();
-        }
-
-        // POST: api/FoodItems
-        [HttpPost]
-        public async Task<ActionResult<FoodItem>> PostFoodItem(FoodItem foodItem)
-        {
-            var result = await _foodItemService.CreateAsync(foodItem);
-
-            if (!result.IsSuccess)
-            {
-                return BadRequest(result.Error);
-            }
-
-            return CreatedAtAction(
-                nameof(GetFoodItem),
-                new { id = foodItem.Id },
-                result.Value
-            );
-        }
-
-        // DELETE: api/FoodItems/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteFoodItem(int id)
-        {
-            var result = await _foodItemService.DeleteAsync(id);
-
-            if (!result.IsSuccess)
-            {
-                if (result.Error == "Food item not found.")
-                {
-                    return NotFound(result.Error);
-                }
-
-                return BadRequest(result.Error);
-            }
-
-            return NoContent();
-        }
+        return NoContent();
     }
 }

@@ -1,5 +1,5 @@
-﻿using FitnessTracker.Application.Interfaces;
-using FitnessTracker.Domain.Entities;
+﻿using FitnessTracker.Application.DTOs.User;
+using FitnessTracker.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FitnessTracker.API.Controllers
@@ -17,42 +17,27 @@ namespace FitnessTracker.API.Controllers
 
         // GET: api/Users
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
+        public async Task<ActionResult<IEnumerable<UserDto>>> GetUsers()
         {
             var result = await _userService.GetAllAsync();
 
-            if (!result.IsSuccess)
+            if (!result.Success)
             {
                 return BadRequest(result.Error);
             }
 
-            return Ok(result.Value);
+            return Ok(result.Data);
         }
 
         // GET: api/Users/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetUser(int id)
+        public async Task<ActionResult<UserDto>> GetUser(int id)
         {
             var result = await _userService.GetByIdAsync(id);
 
-            if (!result.IsSuccess)
+            if (!result.Success)
             {
-                return BadRequest(result.Error);
-            }
-
-            return Ok(result.Value);
-        }
-
-        // PUT: api/Users/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutUser(int id, User user)
-        {
-            var result = await _userService.UpdateAsync(id, user);
-
-            if (!result.IsSuccess)
-            {
-                if (result.Error == "Exercise not found.")
+                if (result.Error == "User not found.")
                 {
                     return NotFound(result.Error);
                 }
@@ -60,26 +45,46 @@ namespace FitnessTracker.API.Controllers
                 return BadRequest(result.Error);
             }
 
-            return NoContent();
+            return Ok(result.Data);
+        }
+
+        // PUT: api/Users/5
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutUser(int id, UpdateUserDto updateUserDto)
+        {
+            var result = await _userService.UpdateAsync(id, updateUserDto);
+
+            if (!result.Success)
+            {
+                if (result.Error == "User not found.")
+                {
+                    return NotFound(result.Error);
+                }
+
+                return BadRequest(result.Error);
+            }
+
+            return Ok(result.Data);
         }
 
         // POST: api/Users
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<User>> PostUser(User user)
+        public async Task<ActionResult<UserDto>> PostUser(CreateUserDto createUserDto)
         {
-            var result = await _userService.CreateAsync(user);
+            var result = await _userService.CreateAsync(createUserDto);
 
-            if (!result.IsSuccess)
+            if (!result.Success)
             {
                 return BadRequest(result.Error);
             }
 
+            var createdUser = result.Data;
+
             return CreatedAtAction(
-                "GetExercise",
-                new { id = user.Id },
-                result.Value
-                );
+                nameof(GetUser),
+                new { id = createdUser!.Id },
+                createdUser
+            );
         }
 
         // DELETE: api/Users/5
@@ -88,12 +93,10 @@ namespace FitnessTracker.API.Controllers
         {
             var result = await _userService.DeleteAsync(id);
 
-            if (!result.IsSuccess)
+            if (!result.Success)
             {
-                if (result.Error == "Exercise not found.")
-                {
+                if (result.Error == "User not found.")
                     return NotFound(result.Error);
-                }
 
                 return BadRequest(result.Error);
             }
