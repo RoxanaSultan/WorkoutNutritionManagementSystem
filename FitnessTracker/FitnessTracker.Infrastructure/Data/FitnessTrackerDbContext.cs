@@ -168,22 +168,25 @@ public partial class FitnessTrackerDbContext : DbContext
 
         modelBuilder.Entity<WorkoutExercise>(entity =>
         {
-            entity
-                .HasNoKey()
-                .ToTable("WorkoutExercise");
+            entity.ToTable("WorkoutExercise");
+
+            entity.HasKey(e => new { e.WorkoutId, e.ExerciseId });
 
             entity.Property(e => e.WeightUsed).HasColumnType("decimal(6, 2)");
 
-            entity.HasOne(d => d.Exercise).WithMany()
-                .HasForeignKey(d => d.ExerciseId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__WorkoutEx__Exerc__4E88ABD4");
+            entity.HasOne(we => we.Workout)
+                  .WithMany(w => w.WorkoutExercises)
+                  .HasForeignKey(we => we.WorkoutId)
+                  .OnDelete(DeleteBehavior.ClientSetNull)
+                  .HasConstraintName("FK__WorkoutEx__Worko__4D94879B");
 
-            entity.HasOne(d => d.Workout).WithMany()
-                .HasForeignKey(d => d.WorkoutId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__WorkoutEx__Worko__4D94879B");
+            entity.HasOne(we => we.Exercise)
+                  .WithMany()
+                  .HasForeignKey(we => we.ExerciseId)
+                  .OnDelete(DeleteBehavior.ClientSetNull)
+                  .HasConstraintName("FK__WorkoutEx__Exerc__4E88ABD4");
         });
+
 
         OnModelCreatingPartial(modelBuilder);
     }

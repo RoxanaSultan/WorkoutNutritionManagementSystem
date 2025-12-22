@@ -13,4 +13,5 @@ public partial class Workout
     public int UserId { get; set; }
 
     public virtual User User { get; set; } = null!;
+    public virtual ICollection<WorkoutExercise> WorkoutExercises { get; set; } = new List<WorkoutExercise>();
 }
