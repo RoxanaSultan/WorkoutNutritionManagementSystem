@@ -1,5 +1,5 @@
 ﻿namespace FitnessTracker.Application.DTOs.Workout;
 
-public class UpdateWorkoutDto : CreateWorkoutDto
+public class UpdateWorkoutDto : WorkoutBase
 {
 }
