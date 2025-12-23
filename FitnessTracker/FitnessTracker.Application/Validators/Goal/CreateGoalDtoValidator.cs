@@ -7,10 +7,9 @@ public class CreateGoalDtoValidator : AbstractValidator<CreateGoalDto>
 {
     public CreateGoalDtoValidator()
     {
-        RuleFor(x => x.TargetValue)
-            .GreaterThan(0).WithMessage("TargetValue must be a positive number");
+        Include(new GoalDtoValidator());
 
-        RuleFor(x => x.StartDate)
-            .LessThanOrEqualTo(x => x.EndDate).WithMessage("Start date must be less than or equal to end date.");
+        RuleFor(x => x.UserId)
+           .GreaterThan(0).WithMessage("UserId must be greater than 0.");
     }
 }

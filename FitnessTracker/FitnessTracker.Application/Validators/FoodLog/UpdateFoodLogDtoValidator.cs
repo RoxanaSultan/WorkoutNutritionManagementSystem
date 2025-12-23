@@ -7,6 +7,6 @@ public class UpdateFoodLogDtoValidator : AbstractValidator<CreateFoodLogDto>
 {
     public UpdateFoodLogDtoValidator()
     {
-        Include(new CreateFoodLogDtoValidator());
+        Include(new FoodLogValidator());
     }
 }

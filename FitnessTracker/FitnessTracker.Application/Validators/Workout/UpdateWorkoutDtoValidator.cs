@@ -6,6 +6,6 @@ public class UpdateWorkoutDtoValidator : AbstractValidator<UpdateWorkoutDto>
 {
     public UpdateWorkoutDtoValidator()
     {
-        Include(new CreateWorkoutDtoValidator());
+        Include(new WorkoutValidator());
     }
 }

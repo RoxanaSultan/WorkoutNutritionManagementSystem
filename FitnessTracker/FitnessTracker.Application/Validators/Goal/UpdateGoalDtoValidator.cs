@@ -7,6 +7,6 @@ public class UpdateGoalDtoValidator : AbstractValidator<UpdateGoalDto>
 {
     public UpdateGoalDtoValidator()
     {
-        Include(new CreateGoalDtoValidator());
+        Include(new GoalDtoValidator());
     }
 }

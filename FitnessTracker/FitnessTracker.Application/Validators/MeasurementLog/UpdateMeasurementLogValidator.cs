@@ -7,6 +7,6 @@ public class UpdateMeasurementLogValidator : AbstractValidator<UpdateMeasurement
 {
     public UpdateMeasurementLogValidator()
     {
-        Include(new CreateMeasurementLogDtoValidator());
+        Include(new MeasurementLogValidator());
     }
 }
