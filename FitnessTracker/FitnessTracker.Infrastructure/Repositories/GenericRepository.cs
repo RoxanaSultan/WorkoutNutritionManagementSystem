@@ -25,13 +25,11 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
     public async Task CreateAsync(T entity)
     {
         _context.Set<T>().Add(entity);
-        await _context.SaveChangesAsync();
     }
 
     public async Task UpdateAsync(T entity)
     {
         _context.Entry(entity).State = EntityState.Modified;
-        await _context.SaveChangesAsync();
     }
 
     public async Task DeleteAsync(int id)

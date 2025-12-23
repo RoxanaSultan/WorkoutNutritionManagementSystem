@@ -15,7 +15,7 @@ public class FoodItemRepository : GenericRepository<FoodItem>, IFoodItemReposito
         _context = context;
     }
 
-    public async Task<bool> ExistsByNameAsync(string normalizedName, int? ignoreId = null)
+    public async Task<bool> ExistsByNameAsync(string name, int? ignoreId = null)
     {
         var query = _context.FoodItems.AsNoTracking().AsQueryable();
 
@@ -26,7 +26,7 @@ public class FoodItemRepository : GenericRepository<FoodItem>, IFoodItemReposito
 
         return await query.AnyAsync(x =>
             x.Name != null &&
-            x.Name.Trim().ToLower() == normalizedName
+            x.Name.Trim().ToLower() == name
         );
     }
 }

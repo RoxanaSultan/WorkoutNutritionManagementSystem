@@ -14,7 +14,7 @@ public class ExerciseRepository : GenericRepository<Exercise>, IExerciseReposito
         _context = context;
     }
 
-    public async Task<bool> ExistsByNameAsync(string normalizedName, int? ignoreExerciseId = null)
+    public async Task<bool> ExistsByNameAsync(string name, int? ignoreExerciseId = null)
     {
         var query = _context.Exercises.AsQueryable();
 
@@ -22,7 +22,7 @@ public class ExerciseRepository : GenericRepository<Exercise>, IExerciseReposito
             query = query.Where(e => e.Id != ignoreExerciseId.Value);
 
         return await query.AnyAsync(e =>
-            e.Name.ToLower() == normalizedName
+            e.Name.ToLower() == name
         );
     }
 
