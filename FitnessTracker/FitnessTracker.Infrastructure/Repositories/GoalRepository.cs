@@ -25,7 +25,7 @@ public class GoalRepository :
     {
         return await _context.Goals.AnyAsync(g =>
             g.UserId == userId &&
-            g.GoalType != null &&
+            g.GoalType != goalType &&
             (ignoreGoalId == null || g.Id != ignoreGoalId.Value) &&
             g.StartDate <= endDate &&
             startDate <= g.EndDate

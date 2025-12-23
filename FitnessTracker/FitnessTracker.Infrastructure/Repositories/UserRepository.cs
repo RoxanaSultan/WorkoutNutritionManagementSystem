@@ -14,7 +14,6 @@ public class UserRepository : GenericRepository<User>, IUserRepository
         _context = context;
     }
 
-
     public async Task<bool> ExistsByEmailAsync(string email)
     {
         return await _context.Users.AnyAsync(u => u.Email == email);

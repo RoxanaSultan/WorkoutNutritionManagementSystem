@@ -22,7 +22,7 @@ public class ExerciseRepository : GenericRepository<Exercise>, IExerciseReposito
             query = query.Where(e => e.Id != ignoreExerciseId.Value);
 
         return await query.AnyAsync(e =>
-            e.Name.ToLower() == name
+            e.Name == name
         );
     }
 

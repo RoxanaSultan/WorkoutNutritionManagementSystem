@@ -34,9 +34,16 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
 
     public async Task DeleteAsync(int id)
     {
-        await _context
+        try
+        {
+            await _context
                 .Set<T>()
                 .Where(e => EF.Property<int>(e, "Id") == id)
                 .ExecuteDeleteAsync();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
     }
 }

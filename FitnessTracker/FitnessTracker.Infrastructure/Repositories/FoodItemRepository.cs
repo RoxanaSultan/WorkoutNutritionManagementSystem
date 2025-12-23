@@ -26,7 +26,7 @@ public class FoodItemRepository : GenericRepository<FoodItem>, IFoodItemReposito
 
         return await query.AnyAsync(x =>
             x.Name != null &&
-            x.Name.Trim().ToLower() == name
+            x.Name == name
         );
     }
 }

@@ -31,15 +31,6 @@ public class WorkoutRepository : GenericRepository<Workout>, IWorkoutRepository
         );
     }
 
-    public async Task<Workout?> GetByIdWithExercisesAsync(int id)
-    {
-        return await _context.Workouts
-            .Include(w => w.User)
-            .Include(w => w.WorkoutExercises)
-                .ThenInclude(we => we.Exercise)
-            .FirstOrDefaultAsync(w => w.Id == id);
-    }
-
     public async Task<bool> WorkoutExerciseExistsAsync(int workoutId, int exerciseId)
     {
         return await _context.WorkoutExercises
@@ -51,7 +42,6 @@ public class WorkoutRepository : GenericRepository<Workout>, IWorkoutRepository
     {
         return await _context.WorkoutExercises
             .Where(we => we.WorkoutId == workoutId)
-            .Include(we => we.Exercise)
             .ToListAsync();
     }
 
