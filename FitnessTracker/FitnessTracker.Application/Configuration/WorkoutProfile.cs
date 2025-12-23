@@ -9,11 +9,7 @@ public class WorkoutProfile : Profile
     public WorkoutProfile()
     {
         CreateMap<Workout, WorkoutDto>();
-
-        CreateMap<CreateWorkoutDto, Workout>()
-            .ForMember(dest => dest.Id, opt => opt.Ignore());
-
-        CreateMap<UpdateWorkoutDto, Workout>()
-            .ForMember(dest => dest.Id, opt => opt.Ignore());
+        CreateMap<CreateWorkoutDto, Workout>();
+        CreateMap<UpdateWorkoutDto, Workout>();
     }
 }

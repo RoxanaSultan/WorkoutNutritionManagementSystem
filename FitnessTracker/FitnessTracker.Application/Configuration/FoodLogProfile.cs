@@ -9,10 +9,7 @@ public class FoodLogProfile : Profile
     public FoodLogProfile()
     {
         CreateMap<FoodItem, FoodLogDto>();
-
         CreateMap<CreateFoodLogDto, FoodItem>();
-
-        CreateMap<UpdateFoodLogDto, FoodItem>()
-            .ForMember(dest => dest.Id, opt => opt.Ignore());
+        CreateMap<UpdateFoodLogDto, FoodItem>();
     }
 }

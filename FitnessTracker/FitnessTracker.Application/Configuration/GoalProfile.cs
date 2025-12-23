@@ -9,11 +9,7 @@ public class GoalProfile : Profile
     public GoalProfile()
     {
         CreateMap<Goal, GoalDto>();
-
-        CreateMap<CreateGoalDto, Goal>()
-            .ForMember(dest => dest.Id, opt => opt.Ignore());
-
-        CreateMap<UpdateGoalDto, Goal>()
-            .ForMember(dest => dest.Id, opt => opt.Ignore());
+        CreateMap<CreateGoalDto, Goal>();
+        CreateMap<UpdateGoalDto, Goal>();
     }
 }

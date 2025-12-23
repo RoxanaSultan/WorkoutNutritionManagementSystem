@@ -9,8 +9,6 @@ public class WorkoutExerciseProfile : Profile
     public WorkoutExerciseProfile()
     {
         CreateMap<WorkoutExercise, WorkoutExerciseDto>();
-
-        CreateMap<CreateWorkoutExerciseDto, WorkoutExercise>()
-            .ForMember(d => d.WorkoutId, opt => opt.Ignore());
+        CreateMap<CreateWorkoutExerciseDto, WorkoutExercise>();
     }
 }

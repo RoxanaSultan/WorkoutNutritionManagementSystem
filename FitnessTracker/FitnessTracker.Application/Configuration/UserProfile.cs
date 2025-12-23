@@ -10,13 +10,6 @@ public class UserProfile : Profile
     {
         CreateMap<User, UserDto>();
         CreateMap<CreateUserDto, User>();
-
-        CreateMap<UpdateUserDto, User>()
-            .ForMember(dest => dest.Id, opt => opt.Ignore())
-            .ForMember(dest => dest.RegistrationDate, opt => opt.Ignore())
-            .ForMember(dest => dest.FoodLogs, opt => opt.Ignore())
-            .ForMember(dest => dest.Goals, opt => opt.Ignore())
-            .ForMember(dest => dest.MeasurementLogs, opt => opt.Ignore())
-            .ForMember(dest => dest.Workouts, opt => opt.Ignore());
+        CreateMap<UpdateUserDto, User>();
     }
 }

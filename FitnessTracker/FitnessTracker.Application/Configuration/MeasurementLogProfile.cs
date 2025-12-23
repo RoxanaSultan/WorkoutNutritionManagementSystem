@@ -6,8 +6,8 @@ public class MeasurementLogProfile : Profile
 {
     public MeasurementLogProfile()
     {
-        CreateMap<MeasurementLog, MeasurementLogDto>().ReverseMap();
-        CreateMap<CreateMeasurementLogDto, MeasurementLog>().ReverseMap();
-        CreateMap<UpdateMeasurementLogDto, MeasurementLog>().ReverseMap();
+        CreateMap<MeasurementLog, MeasurementLogDto>();
+        CreateMap<CreateMeasurementLogDto, MeasurementLog>();
+        CreateMap<UpdateMeasurementLogDto, MeasurementLog>();
     }
 }

@@ -10,7 +10,6 @@ public class ExerciseProfile : Profile
     {
         CreateMap<Exercise, ExerciseDto>();
         CreateMap<CreateExerciseDto, Exercise>();
-        CreateMap<UpdateExerciseDto, Exercise>()
-            .ForMember(d => d.Id, opt => opt.Ignore());
+        CreateMap<UpdateExerciseDto, Exercise>();
     }
 }
