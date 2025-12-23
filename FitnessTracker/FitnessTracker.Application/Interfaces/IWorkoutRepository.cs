@@ -6,7 +6,6 @@ public interface IWorkoutRepository : IGenericRepository<Workout>
 {
     Task<bool> ExistsSameStartTimeAsync(int userId, DateTime dateToMinute, int? ignoreWorkoutId = null);
 
-    Task<Workout?> GetByIdWithExercisesAsync(int id);
     Task<bool> WorkoutExerciseExistsAsync(int workoutId, int exerciseId);
     Task<IEnumerable<WorkoutExercise>> GetWorkoutExercisesByWorkoutIdAsync(int workoutId);
     Task AddWorkoutExerciseAsync(WorkoutExercise workoutExercise);

@@ -1,23 +1,28 @@
 using FitnessTracker.Application.Configuration;
 using FitnessTracker.Application.Interfaces;
 using FitnessTracker.Application.Services;
+using FitnessTracker.Application.Services.Validators;
+using FitnessTracker.Application.Validators.User;
+using FitnessTracker.Infrastructure;
 using FitnessTracker.Infrastructure.Data;
 using FitnessTracker.Infrastructure.Repositories;
-using Microsoft.EntityFrameworkCore;
-using Serilog;
 using FluentValidation;
 using FluentValidation.AspNetCore;
-using FitnessTracker.Application.Validators.User;
-using FitnessTracker.Application.Services.Validators;
+using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-var connectionString = builder.Configuration.GetConnectionString("FitnessTrackerDbConnectionString");
 builder.Services.AddDbContext<FitnessTrackerDbContext>(options =>
 {
-    options.UseSqlServer(connectionString);
+    options.UseSqlServer(builder.Configuration.GetConnectionString("FitnessTrackerDbConnectionString"));
+
+    options.LogTo(Console.WriteLine, LogLevel.Information);
+
+    options.EnableSensitiveDataLogging();
+    options.EnableDetailedErrors();
 });
 
 builder.Services.AddValidatorsFromAssembly(typeof(CreateUserDtoValidator).Assembly);
@@ -46,6 +51,8 @@ builder.Services.AddScoped<IMeasurementLogService, MeasurementLogService>();
 builder.Services.AddScoped<IGoalRepository, GoalRepository>();
 builder.Services.AddScoped<IGoalService, GoalService>();
 
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
 builder.Services.AddScoped<IUserServiceValidator, UserServiceValidator>();
 builder.Services.AddScoped<IGoalServiceValidator, GoalServiceValidator>();
 builder.Services.AddScoped<IWorkoutServiceValidator, WorkoutServiceValidator>();
@@ -73,6 +80,40 @@ builder.Host.UseSerilog((ctx, lc) => lc.WriteTo.Console().ReadFrom.Configuration
 
 var app = builder.Build();
 
+app.UseExceptionHandler(errorApp =>
+{
+    errorApp.Run(async context =>
+    {
+        var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
+
+        var exceptionHandlerPathFeature =
+            context.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerPathFeature>();
+
+        if (exceptionHandlerPathFeature?.Error != null)
+        {
+            logger.LogError(exceptionHandlerPathFeature.Error,
+                "Unhandled exception on path {Path}", exceptionHandlerPathFeature.Path);
+        }
+
+        context.Response.StatusCode = 500;
+        await context.Response.WriteAsJsonAsync(new { message = "Internal server error" });
+    });
+});
+
+app.Use(async (context, next) =>
+{
+    var logger = context.RequestServices.GetRequiredService<ILoggerFactory>()
+        .CreateLogger("RequestLogger");
+
+    logger.LogInformation("HTTP {Method} {Path} started",
+        context.Request.Method, context.Request.Path);
+
+    await next();
+
+    logger.LogInformation("HTTP {Method} {Path} finished with {StatusCode}",
+        context.Request.Method, context.Request.Path, context.Response.StatusCode);
+});
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -85,6 +126,8 @@ app.UseHttpsRedirection();
 app.UseCors("AllowAll");
 
 app.UseAuthorization();
+
+
 
 app.MapControllers();
 
