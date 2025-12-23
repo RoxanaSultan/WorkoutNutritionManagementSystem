@@ -80,7 +80,7 @@ public class GoalServiceValidator : IGoalServiceValidator
             return Result.Fail("Target value must be greater than user's current weight for weight gain goals.");
 
         var overlaps = await _goalRepository.ExistsOverlappingGoalAsync(
-            updateGoalDto.UserId,
+            user.Id,
             goalType,
             startDate,
             endDate,

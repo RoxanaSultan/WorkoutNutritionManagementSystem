@@ -9,76 +9,86 @@ namespace FitnessTracker.Application.Services;
 
 public class FoodItemService : IFoodItemService
 {
-    private readonly IFoodItemRepository _foodItemRepository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     private readonly IFoodItemServiceValidator _validator;
 
     public FoodItemService(
-        IFoodItemRepository foodItemRepository,
-        IMapper mapper,
-        IFoodItemServiceValidator validator)
+        IUnitOfWork unitOfWork, IMapper mapper, IFoodItemServiceValidator validator)
     {
-        _foodItemRepository = foodItemRepository;
+        _unitOfWork = unitOfWork;
         _mapper = mapper;
         _validator = validator;
     }
 
     public async Task<Result<IEnumerable<FoodItemDto>>> GetAllAsync()
     {
-        var items = await _foodItemRepository.GetAllAsync();
-        var dtos = _mapper.Map<IEnumerable<FoodItemDto>>(items);
-        return Result<IEnumerable<FoodItemDto>>.Ok(dtos);
+        var foodItems = await _unitOfWork.FoodItems.GetAllAsync();
+        var foodItemsDtos = _mapper.Map<IEnumerable<FoodItemDto>>(foodItems);
+        return Result<IEnumerable<FoodItemDto>>.Ok(foodItemsDtos);
     }
 
     public async Task<Result<FoodItemDto>> GetByIdAsync(int id)
     {
-        var item = await _foodItemRepository.GetByIdAsync(id);
-        if (item == null)
+        var foodItem = await _unitOfWork.FoodItems.GetByIdAsync(id);
+        if (foodItem == null)
+        {
             return Result<FoodItemDto>.Fail("Food item not found.");
+        }
 
-        return Result<FoodItemDto>.Ok(_mapper.Map<FoodItemDto>(item));
+        var foodItemDto = _mapper.Map<FoodItemDto>(foodItem);
+        return Result<FoodItemDto>.Ok(foodItemDto);
     }
 
-    public async Task<Result<FoodItemDto>> CreateAsync(CreateFoodItemDto createDto)
+    public async Task<Result<FoodItemDto>> CreateAsync(CreateFoodItemDto createFoodItemDto)
     {
-        var validation = await _validator.ValidateCreateAsync(createDto);
+        var validation = await _validator.ValidateCreateAsync(createFoodItemDto);
         if (!validation.Success)
+        {
             return Result<FoodItemDto>.Fail(validation.Error);
+        }
 
-        // normalize name înainte de persist (ca să păstrezi consistența)
-        createDto.Name = createDto.Name.Trim();
+        var foodItem = _mapper.Map<FoodItem>(createFoodItemDto);
+        await _unitOfWork.FoodItems.CreateAsync(foodItem);
+        await _unitOfWork.SaveChangesAsync();
 
-        var entity = _mapper.Map<FoodItem>(createDto);
-        await _foodItemRepository.CreateAsync(entity);
-
-        return Result<FoodItemDto>.Ok(_mapper.Map<FoodItemDto>(entity));
+        var foodItemDto = _mapper.Map<FoodItemDto>(foodItem);
+        return Result<FoodItemDto>.Ok(foodItemDto);
     }
 
-    public async Task<Result<FoodItemDto>> UpdateAsync(int id, UpdateFoodItemDto updateDto)
+    public async Task<Result<FoodItemDto>> UpdateAsync(int id, UpdateFoodItemDto updateFoodItemDto)
     {
-        var existing = await _foodItemRepository.GetByIdAsync(id);
-        if (existing == null)
+        var existingFoodItem = await _unitOfWork.FoodItems.GetByIdAsync(id);
+        if (existingFoodItem == null)
+        {
             return Result<FoodItemDto>.Fail("Food item not found.");
+        }
 
-        var validation = await _validator.ValidateUpdateAsync(updateDto, id);
+        var validation = await _validator.ValidateUpdateAsync(updateFoodItemDto, id);
         if (!validation.Success)
+        {
             return Result<FoodItemDto>.Fail(validation.Error);
+        }
 
-        updateDto.Name = updateDto.Name.Trim();
+        _mapper.Map(updateFoodItemDto, existingFoodItem);
+        await _unitOfWork.FoodItems.UpdateAsync(existingFoodItem);
+        await _unitOfWork.SaveChangesAsync();
 
-        _mapper.Map(updateDto, existing);
-        await _foodItemRepository.UpdateAsync(existing);
-
-        return Result<FoodItemDto>.Ok(_mapper.Map<FoodItemDto>(existing));
+        var foodItemDto = _mapper.Map<FoodItemDto>(existingFoodItem);
+        return Result<FoodItemDto>.Ok(foodItemDto);
     }
 
     public async Task<Result<FoodItemDto>> DeleteAsync(int id)
     {
-        var existing = await _foodItemRepository.GetByIdAsync(id);
-        if (existing == null)
+        var existingFoodItem = await _unitOfWork.FoodItems.GetByIdAsync(id);
+        if (existingFoodItem == null)
+        {
             return Result<FoodItemDto>.Fail("Food item not found.");
+        }
 
-        await _foodItemRepository.DeleteAsync(id);
-        return Result<FoodItemDto>.Ok(_mapper.Map<FoodItemDto>(existing));
+        await _unitOfWork.FoodItems.DeleteAsync(id);
+        await _unitOfWork.SaveChangesAsync();
+        var foodItemDto = _mapper.Map<FoodItemDto>(existingFoodItem);
+        return Result<FoodItemDto>.Ok(foodItemDto);
     }
 }

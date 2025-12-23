@@ -58,7 +58,7 @@ public class WorkoutServiceValidator : IWorkoutServiceValidator
         if (dto.DurationInMinutes < 5 || dto.DurationInMinutes > 300)
             return Result.Fail("Duration must be between 5 and 300 minutes.");
 
-        var exists = await _workoutRepository.ExistsSameStartTimeAsync(dto.UserId, dateToMinute, ignoreWorkoutId: workoutId);
+        var exists = await _workoutRepository.ExistsSameStartTimeAsync(user.Id, dateToMinute, ignoreWorkoutId: workoutId);
         if (exists)
             return Result.Fail("User cannot log more than one workout with the same start time.");
 

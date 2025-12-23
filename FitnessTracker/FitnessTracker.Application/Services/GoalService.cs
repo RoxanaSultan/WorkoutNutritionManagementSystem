@@ -9,43 +9,38 @@ namespace FitnessTracker.Application.Services;
 
 public class GoalService : IGoalService
 {
-    private readonly IGoalRepository _goalRepository;
-    private readonly IUserRepository _userRepository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     private readonly IGoalServiceValidator _goalServiceValidator;
-    public GoalService(IGoalRepository goalRepository, IUserRepository userRepository, IMapper mapper, IGoalServiceValidator goalServiceValidator)
+    public GoalService(IUnitOfWork unitOfWork, IMapper mapper, IGoalServiceValidator goalServiceValidator)
     {
-        _goalRepository = goalRepository;
-        _userRepository = userRepository;
+        _unitOfWork = unitOfWork;
         _mapper = mapper;
         _goalServiceValidator = goalServiceValidator;
     }
 
     public async Task<Result<IEnumerable<GoalDto>>> GetAllAsync()
     {
-        var goals = await _goalRepository.GetAllAsync();
+        var goals = await _unitOfWork.Goals.GetAllAsync();
         var goalsDto = _mapper.Map<IEnumerable<GoalDto>>(goals);
-
         return Result<IEnumerable<GoalDto>>.Ok(goalsDto);
     }
 
     public async Task<Result<GoalDto>> GetByIdAsync(int id)
     {
-        var goal = await _goalRepository.GetByIdAsync(id);
-
+        var goal = await _unitOfWork.Goals.GetByIdAsync(id);
         if (goal == null)
         {
             return Result<GoalDto>.Fail("Goal not found.");
         }
 
         var goalDto = _mapper.Map<GoalDto>(goal);
-
         return Result<GoalDto>.Ok(goalDto);
     }
 
     public async Task<Result<GoalDto>> CreateAsync(CreateGoalDto createGoalDto)
     {
-        var user = await _userRepository.GetByIdAsync(createGoalDto.UserId);
+        var user = await _unitOfWork.Users.GetByIdAsync(createGoalDto.UserId);
         if (user == null)
         {
             return Result<GoalDto>.Fail($"User with id {createGoalDto.UserId} not found.");
@@ -58,7 +53,8 @@ public class GoalService : IGoalService
         }
 
         var goal = _mapper.Map<Goal>(createGoalDto);
-        await _goalRepository.CreateAsync(goal);
+        await _unitOfWork.Goals.CreateAsync(goal);
+        await _unitOfWork.SaveChangesAsync();
 
         var goalDto = _mapper.Map<GoalDto>(goal);
         return Result<GoalDto>.Ok(goalDto);
@@ -66,11 +62,11 @@ public class GoalService : IGoalService
 
     public async Task<Result<GoalDto>> UpdateAsync(int id, UpdateGoalDto updateGoalDto)
     {
-        var existingGoal = await _goalRepository.GetByIdAsync(id);
+        var existingGoal = await _unitOfWork.Goals.GetByIdAsync(id);
         if (existingGoal == null)
             return Result<GoalDto>.Fail("Goal not found.");
 
-        var user = await _userRepository.GetByIdAsync(updateGoalDto.UserId);
+        var user = await _unitOfWork.Users.GetByIdAsync(existingGoal.UserId);
         if (user == null)
         {
             return Result<GoalDto>.Fail("User not found.");
@@ -83,7 +79,8 @@ public class GoalService : IGoalService
         }
 
         _mapper.Map(updateGoalDto, existingGoal);
-        await _goalRepository.UpdateAsync(existingGoal);
+        await _unitOfWork.Goals.UpdateAsync(existingGoal);
+        await _unitOfWork.SaveChangesAsync();
 
         var goalDto = _mapper.Map<GoalDto>(existingGoal);
         return Result<GoalDto>.Ok(goalDto);
@@ -92,13 +89,14 @@ public class GoalService : IGoalService
 
     public async Task<Result<GoalDto>> DeleteAsync(int id)
     {
-        var goal = await _goalRepository.GetByIdAsync(id);
+        var goal = await _unitOfWork.Goals.GetByIdAsync(id);
         if (goal == null)
         {
             return Result<GoalDto>.Fail("Goal not found.");
         }
 
-        await _goalRepository.DeleteAsync(id);
+        await _unitOfWork.Goals.DeleteAsync(id);
+        await _unitOfWork.SaveChangesAsync();
 
         var goalDto = _mapper.Map<GoalDto>(goal);
         return Result<GoalDto>.Ok(goalDto);
