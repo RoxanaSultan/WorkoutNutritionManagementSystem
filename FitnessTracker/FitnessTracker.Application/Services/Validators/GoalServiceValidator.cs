@@ -57,8 +57,7 @@ public class GoalServiceValidator : IGoalServiceValidator
 
     public async Task<Result> ValidateUpdateAsync(User user, UpdateGoalDto updateGoalDto, int goalId)
     {
-        // normalize exact ca la Create (și fără ToLowerInvariant în repo!)
-        var goalType = (updateGoalDto.GoalType ?? string.Empty).Trim().ToLowerInvariant();
+        var goalType = updateGoalDto.GoalType;
         var startDate = updateGoalDto.StartDate;
         var endDate = updateGoalDto.EndDate;
         var targetValue = updateGoalDto.TargetValue;

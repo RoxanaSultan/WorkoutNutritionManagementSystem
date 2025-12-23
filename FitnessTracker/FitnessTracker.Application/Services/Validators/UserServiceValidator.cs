@@ -41,7 +41,4 @@ public class UserServiceValidator : IUserServiceValidator
 
     private async Task<bool> IsEmailUniqueForUpdateAsync(int id, string email)
         => !await _userRepository.ExistsByEmailExceptUserIdAsync(email, id);
-
-    //private async Task<bool> DoesUserExistAsync(int id)
-    //    => await _userRepository.GetByIdAsync(id) != null;
 }

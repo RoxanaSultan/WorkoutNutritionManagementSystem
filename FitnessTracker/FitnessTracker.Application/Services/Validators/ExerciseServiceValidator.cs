@@ -13,12 +13,9 @@ public class ExerciseServiceValidator : IExerciseServiceValidator
         _exerciseRepository = exerciseRepository;
     }
 
-    private static string NormalizeName(string name)
-        => (name ?? string.Empty).Trim().ToLowerInvariant();
-
     public async Task<Result> ValidateCreateAsync(CreateExerciseDto dto)
     {
-        var name = NormalizeName(dto.Name);
+        var name = dto.Name;
 
         if (string.IsNullOrWhiteSpace(name))
             return Result.Fail("Name is required.");
@@ -32,7 +29,7 @@ public class ExerciseServiceValidator : IExerciseServiceValidator
 
     public async Task<Result> ValidateUpdateAsync(int id, UpdateExerciseDto dto)
     {
-        var name = NormalizeName(dto.Name);
+        var name = dto.Name;
 
         if (string.IsNullOrWhiteSpace(name))
             return Result.Fail("Name is required.");
