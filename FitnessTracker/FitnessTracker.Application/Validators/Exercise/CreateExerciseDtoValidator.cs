@@ -1,6 +1,5 @@
-﻿using FluentValidation;
-using FitnessTracker.Application.Constants;
-using FitnessTracker.Application.DTOs.Exercise;
+﻿using FitnessTracker.Application.DTOs.Exercise;
+using FluentValidation;
 
 namespace FitnessTracker.Application.Validators.Exercise;
 

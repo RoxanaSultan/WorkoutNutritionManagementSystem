@@ -1,5 +1,5 @@
-﻿using FluentValidation;
-using FitnessTracker.Application.DTOs.Workout;
+﻿using FitnessTracker.Application.DTOs.Workout;
+using FluentValidation;
 
 namespace FitnessTracker.Application.Validators.Workout;
 

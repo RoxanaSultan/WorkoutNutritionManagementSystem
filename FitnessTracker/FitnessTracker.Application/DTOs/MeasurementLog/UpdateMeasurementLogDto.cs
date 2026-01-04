@@ -1,5 +1,5 @@
 ﻿namespace FitnessTracker.Application.DTOs.MeasurementLog;
 
-public class UpdateMeasurementLogDto : MeasurementLogDtoBase
+public class UpdateMeasurementLogDto : MeasurementLogBase
 {
 }

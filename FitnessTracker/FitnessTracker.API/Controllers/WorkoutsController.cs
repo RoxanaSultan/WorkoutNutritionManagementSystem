@@ -1,6 +1,6 @@
 ﻿using FitnessTracker.Application.DTOs.Workout;
 using FitnessTracker.Application.DTOs.WorkoutExercise;
-using FitnessTracker.Application.Interfaces;
+using FitnessTracker.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FitnessTracker.API.Controllers;

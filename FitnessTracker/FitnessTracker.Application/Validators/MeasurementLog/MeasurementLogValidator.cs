@@ -3,7 +3,7 @@ using FluentValidation;
 
 namespace FitnessTracker.Application.Validators.MeasurementLog;
 
-public class MeasurementLogValidator : AbstractValidator<MeasurementLogDtoBase>
+public class MeasurementLogValidator : AbstractValidator<MeasurementLogBase>
 {
     public MeasurementLogValidator()
     {

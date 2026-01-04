@@ -1,7 +1,9 @@
 using FitnessTracker.Application.Configuration;
-using FitnessTracker.Application.Interfaces;
+using FitnessTracker.Application.Interfaces.Repositories;
+using FitnessTracker.Application.Interfaces.Services;
+using FitnessTracker.Application.Interfaces.ServiceValidators;
 using FitnessTracker.Application.Services;
-using FitnessTracker.Application.Services.Validators;
+using FitnessTracker.Application.Services.ServiceValidators;
 using FitnessTracker.Application.Validators.User;
 using FitnessTracker.Infrastructure;
 using FitnessTracker.Infrastructure.Data;

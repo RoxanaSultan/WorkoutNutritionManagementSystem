@@ -1,8 +1,9 @@
 ﻿using AutoMapper;
 using FitnessTracker.Application.DTOs.Goal;
-using FitnessTracker.Application.Interfaces;
+using FitnessTracker.Application.Interfaces.Repositories;
+using FitnessTracker.Application.Interfaces.Services;
+using FitnessTracker.Application.Interfaces.ServiceValidators;
 using FitnessTracker.Application.Results;
-using FitnessTracker.Application.Services.Validators;
 using FitnessTracker.Domain.Entities;
 
 namespace FitnessTracker.Application.Services;

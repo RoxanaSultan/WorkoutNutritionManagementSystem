@@ -1,6 +1,6 @@
 ﻿namespace FitnessTracker.Application.DTOs.MeasurementLog;
 
-public class CreateMeasurementLogDto : MeasurementLogDtoBase
+public class CreateMeasurementLogDto : MeasurementLogBase
 {
     public int UserId { get; set; }
 }

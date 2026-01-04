@@ -1,9 +1,6 @@
 ﻿namespace FitnessTracker.Application.DTOs.Exercise;
 
-public class ExerciseDto
+public class ExerciseDto : ExerciseBase
 {
     public int Id { get; set; }
-    public string Name { get; set; } = null!;
-    public string? MuscleGroup { get; set; }
-    public string? DifficultyLevel { get; set; }
 }

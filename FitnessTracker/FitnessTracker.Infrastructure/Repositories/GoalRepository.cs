@@ -1,11 +1,11 @@
-﻿using FitnessTracker.Application.Interfaces;
+﻿using FitnessTracker.Application.Interfaces.Repositories;
 using FitnessTracker.Domain.Entities;
 using FitnessTracker.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace FitnessTracker.Infrastructure.Repositories;
 
-public class GoalRepository : 
+public class GoalRepository :
     GenericRepository<Goal>,
     IGoalRepository
 {

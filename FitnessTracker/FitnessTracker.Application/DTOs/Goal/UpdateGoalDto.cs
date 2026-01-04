@@ -1,5 +1,5 @@
 ﻿namespace FitnessTracker.Application.DTOs.Goal;
 
-public class UpdateGoalDto : GoalDtoBase
+public class UpdateGoalDto : GoalBase
 {
 }

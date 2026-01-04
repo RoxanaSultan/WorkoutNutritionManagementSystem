@@ -1,5 +1,5 @@
 ﻿using FitnessTracker.Application.DTOs.FoodLog;
-using FitnessTracker.Application.Interfaces;
+using FitnessTracker.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FitnessTracker.API.Controllers;
@@ -58,8 +58,8 @@ public class FoodLogsController : ControllerBase
 
         var createdFoodLog = result.Data!;
         return CreatedAtAction(
-            nameof(GetFoodLog), 
-            new { id = createdFoodLog.Id }, 
+            nameof(GetFoodLog),
+            new { id = createdFoodLog.Id },
             createdFoodLog
             );
     }

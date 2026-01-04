@@ -1,5 +1,5 @@
-﻿using FluentValidation;
-using FitnessTracker.Application.DTOs.FoodLog;
+﻿using FitnessTracker.Application.DTOs.FoodLog;
+using FluentValidation;
 
 namespace FitnessTracker.Application.Validators.FoodLog;
 
