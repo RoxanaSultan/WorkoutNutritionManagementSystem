@@ -1,3 +1,4 @@
+using FitnessTracker.API.Middleware;
 using FitnessTracker.Application.Configuration;
 using FitnessTracker.Application.Interfaces.Repositories;
 using FitnessTracker.Application.Interfaces.Services;
@@ -82,25 +83,27 @@ builder.Host.UseSerilog((ctx, lc) => lc.WriteTo.Console().ReadFrom.Configuration
 
 var app = builder.Build();
 
-app.UseExceptionHandler(errorApp =>
-{
-    errorApp.Run(async context =>
-    {
-        var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
+app.UseMiddleware<ExceptionMiddleware>();
 
-        var exceptionHandlerPathFeature =
-            context.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerPathFeature>();
+//app.UseExceptionHandler(errorApp =>
+//{
+//    errorApp.Run(async context =>
+//    {
+//        var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
 
-        if (exceptionHandlerPathFeature?.Error != null)
-        {
-            logger.LogError(exceptionHandlerPathFeature.Error,
-                "Unhandled exception on path {Path}", exceptionHandlerPathFeature.Path);
-        }
+//        var exceptionHandlerPathFeature =
+//            context.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerPathFeature>();
 
-        context.Response.StatusCode = 500;
-        await context.Response.WriteAsJsonAsync(new { message = "Internal server error" });
-    });
-});
+//        if (exceptionHandlerPathFeature?.Error != null)
+//        {
+//            logger.LogError(exceptionHandlerPathFeature.Error,
+//                "Unhandled exception on path {Path}", exceptionHandlerPathFeature.Path);
+//        }
+
+//        context.Response.StatusCode = 500;
+//        await context.Response.WriteAsJsonAsync(new { message = "Internal server error" });
+//    });
+//});
 
 app.Use(async (context, next) =>
 {

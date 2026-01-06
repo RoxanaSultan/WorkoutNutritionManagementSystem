@@ -93,7 +93,7 @@ public class UserService : IUserService
 
         if (!user)
         {
-            return Result<UserDto>.Fail("User not found.");
+            return Result.Fail("User not found.");
         }
 
         var workoutIds = await _unitOfWork.Workouts.GetWorkoutIdsByUserIdAsync(id);
