@@ -1,4 +1,5 @@
-﻿using FitnessTracker.Application.DTOs.FoodItem;
+﻿using FitnessTracker.Application.Common;
+using FitnessTracker.Application.DTOs.FoodItem;
 using FitnessTracker.Application.Interfaces.Repositories;
 using FitnessTracker.Application.Interfaces.ServiceValidators;
 using FitnessTracker.Application.Results;
@@ -18,11 +19,11 @@ public class FoodItemServiceValidator : IFoodItemServiceValidator
     {
         var name = dto.Name;
         if (string.IsNullOrWhiteSpace(name))
-            return Result.Fail("Name is required.");
+            return Result.Fail(ErrorMessages.FoodItemNameRequired);
 
         var exists = await _foodItemRepository.ExistsByNameAsync(name);
         if (exists)
-            return Result.Fail("A food item with the same name already exists.");
+            return Result.Fail(ErrorMessages.FoodItemNameAlreadyExists);
 
         return Result.Ok();
     }
@@ -31,11 +32,11 @@ public class FoodItemServiceValidator : IFoodItemServiceValidator
     {
         var name = dto.Name;
         if (string.IsNullOrWhiteSpace(name))
-            return Result.Fail("Name is required.");
+            return Result.Fail(ErrorMessages.FoodItemNameRequired);
 
         var exists = await _foodItemRepository.ExistsByNameAsync(name, ignoreId: foodItemId);
         if (exists)
-            return Result.Fail("A food item with the same name already exists.");
+            return Result.Fail(ErrorMessages.FoodItemNameAlreadyExists);
 
         return Result.Ok();
     }

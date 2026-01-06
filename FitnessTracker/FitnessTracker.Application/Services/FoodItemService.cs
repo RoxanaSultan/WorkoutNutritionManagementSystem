@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FitnessTracker.Application.Common;
 using FitnessTracker.Application.DTOs.FoodItem;
 using FitnessTracker.Application.Interfaces.Repositories;
 using FitnessTracker.Application.Interfaces.Services;
@@ -36,7 +37,7 @@ public class FoodItemService : IFoodItemService
 
         if (foodItem == null)
         {
-            return Result<FoodItemDto>.Fail("Food item not found.");
+            return Result<FoodItemDto>.Fail(ErrorMessages.FoodItemNotFound);
         }
 
         var foodItemDto = _mapper.Map<FoodItemDto>(foodItem);
@@ -69,7 +70,7 @@ public class FoodItemService : IFoodItemService
 
         if (existingFoodItem == null)
         {
-            return Result<FoodItemDto>.Fail("Food item not found.");
+            return Result<FoodItemDto>.Fail(ErrorMessages.FoodItemNotFound);
         }
 
         var validation = await _validator.ValidateUpdateAsync(updateFoodItemDto, id);
@@ -90,11 +91,11 @@ public class FoodItemService : IFoodItemService
 
     public async Task<Result> DeleteAsync(int id)
     {
-        var existingFoodItem = await _unitOfWork.FoodItems.ExistsAsync(id);
+        var exists = await _unitOfWork.FoodItems.ExistsAsync(id);
 
-        if (!existingFoodItem)
+        if (!exists)
         {
-            return Result.Fail("Food item not found.");
+            return Result.Fail(ErrorMessages.FoodItemNotFound);
         }
 
         await _unitOfWork.FoodItems.DeleteAsync(id);

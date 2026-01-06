@@ -1,4 +1,5 @@
-﻿using FitnessTracker.Application.DTOs.FoodLog;
+﻿using FitnessTracker.Application.Common;
+using FitnessTracker.Application.DTOs.FoodLog;
 using FitnessTracker.Application.Interfaces.ServiceValidators;
 using FitnessTracker.Application.Results;
 using FitnessTracker.Domain.Entities;
@@ -13,7 +14,7 @@ public class FoodLogServiceValidator : IFoodLogServiceValidator
         var logDateOnly = DateOnly.FromDateTime(dto.LogDate);
 
         if (logDateOnly < registrationDate)
-            return Result.Fail("User can't log food before their registration date.");
+            return Result.Fail(ErrorMessages.FoodLogBeforeUserRegistration);
 
         return Result.Ok();
     }
@@ -24,7 +25,7 @@ public class FoodLogServiceValidator : IFoodLogServiceValidator
         var logDateOnly = DateOnly.FromDateTime(dto.LogDate);
 
         if (logDateOnly < registrationDate)
-            return Result.Fail("User can't log food before their registration date.");
+            return Result.Fail(ErrorMessages.FoodLogBeforeUserRegistration);
 
         return Result.Ok();
     }

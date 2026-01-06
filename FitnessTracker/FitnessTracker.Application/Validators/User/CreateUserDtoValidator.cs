@@ -1,4 +1,5 @@
-﻿using FitnessTracker.Application.DTOs.User;
+﻿using FitnessTracker.Application.Common;
+using FitnessTracker.Application.DTOs.User;
 using FluentValidation;
 
 namespace FitnessTracker.Application.Validators.User;
@@ -8,31 +9,31 @@ public class CreateUserDtoValidator : AbstractValidator<CreateUserDto>
     public CreateUserDtoValidator()
     {
         RuleFor(x => x.Name)
-            .NotEmpty().WithMessage("Name cannot be empty.")
-            .MaximumLength(50).WithMessage("Name must have maximum 50 characters.");
+            .NotEmpty().WithMessage(ErrorMessages.UserNameRequired)
+            .MaximumLength(50).WithMessage(ErrorMessages.UserNameMaxLength50);
 
         RuleFor(x => x.Email)
-            .NotEmpty().WithMessage("Email cannot be empty.")
-            .EmailAddress().WithMessage("Email must be in a valid format.");
+            .NotEmpty().WithMessage(ErrorMessages.UserEmailRequired)
+            .EmailAddress().WithMessage(ErrorMessages.UserEmailInvalid);
 
         RuleFor(x => x.BirthDate)
-            .NotEmpty().WithMessage("BirthDate cannot be empty.")
-            .Must(BeInThePast).WithMessage("BirthDate must be in the past.")
-            .Must(BeAtLeast13YearsOld).WithMessage("User must be at least 13 years old.");
+            .NotEmpty().WithMessage(ErrorMessages.UserBirthDateRequired)
+            .Must(BeInThePast).WithMessage(ErrorMessages.UserBirthDateInPast)
+            .Must(BeAtLeast13YearsOld).WithMessage(ErrorMessages.UserTooYoung);
 
         RuleFor(x => x.Height)
             .InclusiveBetween(50, 250)
             .When(x => x.Height.HasValue)
-            .WithMessage("Height must be between 50 cm and 250 cm.");
+            .WithMessage(ErrorMessages.UserHeightRange);
 
         RuleFor(x => x.Weight)
             .InclusiveBetween(20, 400)
             .When(x => x.Weight.HasValue)
-            .WithMessage("Weight must be between 20 kg and 400 kg.");
+            .WithMessage(ErrorMessages.UserWeightRange);
 
         RuleFor(x => x.Gender)
             .Must(BeValidGender)
-            .WithMessage("Gender must be either 'male' or 'female'.");
+            .WithMessage(ErrorMessages.UserGenderInvalid);
     }
 
     private bool BeInThePast(DateOnly birthDate)

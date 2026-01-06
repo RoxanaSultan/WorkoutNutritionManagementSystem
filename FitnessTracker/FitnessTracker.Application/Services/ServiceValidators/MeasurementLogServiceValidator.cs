@@ -1,4 +1,5 @@
-﻿using FitnessTracker.Application.Interfaces.ServiceValidators;
+﻿using FitnessTracker.Application.Common;
+using FitnessTracker.Application.Interfaces.ServiceValidators;
 using FitnessTracker.Application.Results;
 using FitnessTracker.Domain.Entities;
 
@@ -26,7 +27,7 @@ public class MeasurementLogServiceValidator : IMeasurementLogServiceValidator
 
         if (kgPerDay > MaxKgPerDay)
         {
-            return Result.Fail($"Weight change is too large: {kgPerDay:0.##} kg/day (max {MaxKgPerDay} kg/day).");
+            return Result.Fail(ErrorMessages.MeasurementLogWeightChangeTooLarge(kgPerDay, MaxKgPerDay));
         }
 
         return Result.Ok();

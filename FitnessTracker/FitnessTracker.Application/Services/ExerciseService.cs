@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FitnessTracker.Application.Common;
 using FitnessTracker.Application.DTOs.Exercise;
 using FitnessTracker.Application.Interfaces.Repositories;
 using FitnessTracker.Application.Interfaces.Services;
@@ -35,7 +36,7 @@ public class ExerciseService : IExerciseService
 
         if (exercise == null)
         {
-            return Result<ExerciseDto>.Fail("Exercise not found.");
+            return Result<ExerciseDto>.Fail(ErrorMessages.ExerciseNotFound);
         }
 
         var exerciseDto = _mapper.Map<ExerciseDto>(exercise);
@@ -68,7 +69,7 @@ public class ExerciseService : IExerciseService
 
         if (existingExercise == null)
         {
-            return Result<ExerciseDto>.Fail("Exercise not found.");
+            return Result<ExerciseDto>.Fail(ErrorMessages.ExerciseNotFound);
         }
 
         var validation = await _validator.ValidateUpdateAsync(id, updateExerciseDto);
@@ -90,11 +91,11 @@ public class ExerciseService : IExerciseService
 
     public async Task<Result> DeleteAsync(int id)
     {
-        var existingExercise = await _unitOfWork.Exercises.ExistsAsync(id);
+        var exists = await _unitOfWork.Exercises.ExistsAsync(id);
 
-        if (!existingExercise)
+        if (!exists)
         {
-            return Result.Fail("Exercise not found.");
+            return Result.Fail(ErrorMessages.ExerciseNotFound);
         }
 
         var validation = await _validator.ValidateDeleteAsync(id);

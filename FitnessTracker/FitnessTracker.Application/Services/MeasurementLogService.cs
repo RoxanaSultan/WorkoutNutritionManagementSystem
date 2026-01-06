@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FitnessTracker.Application.Common;
 using FitnessTracker.Application.DTOs.MeasurementLog;
 using FitnessTracker.Application.Interfaces.Repositories;
 using FitnessTracker.Application.Interfaces.Services;
@@ -38,7 +39,7 @@ public class MeasurementLogService : IMeasurementLogService
 
         if (measurementLog == null)
         {
-            return Result<MeasurementLogDto>.Fail("Measurement log not found.");
+            return Result<MeasurementLogDto>.Fail(ErrorMessages.MeasurementLogNotFound);
         }
 
         var measurementLogDto = _mapper.Map<MeasurementLogDto>(measurementLog);
@@ -52,12 +53,16 @@ public class MeasurementLogService : IMeasurementLogService
 
         if (user == null)
         {
-            return Result<MeasurementLogDto>.Fail($"User with id {createMeasurementLogDto.UserId} not found.");
+            return Result<MeasurementLogDto>.Fail(ErrorMessages.UserWithIdNotFound(createMeasurementLogDto.UserId));
+            // sau fără id: return Result<MeasurementLogDto>.Fail(ErrorMessages.UserNotFound);
         }
 
         var measurementLog = _mapper.Map<MeasurementLog>(createMeasurementLogDto);
 
-        var previous = await _unitOfWork.MeasurementLogs.GetLatestBeforeAsync(createMeasurementLogDto.UserId, createMeasurementLogDto.Date);
+        var previous = await _unitOfWork.MeasurementLogs.GetLatestBeforeAsync(
+            createMeasurementLogDto.UserId,
+            createMeasurementLogDto.Date);
+
         var validation = await _validator.ValidateCreateAsync(previous, measurementLog);
 
         if (!validation.Success)
@@ -73,25 +78,29 @@ public class MeasurementLogService : IMeasurementLogService
         return Result<MeasurementLogDto>.Ok(measurementLogDto);
     }
 
-    public async Task<Result<MeasurementLogDto>> UpdateAsync(int id, UpdateMeasurementLogDto updateMEasurementLogDto)
+    public async Task<Result<MeasurementLogDto>> UpdateAsync(int id, UpdateMeasurementLogDto updateMeasurementLogDto)
     {
         var existingMeasurementLog = await _unitOfWork.MeasurementLogs.GetByIdAsync(id);
 
         if (existingMeasurementLog == null)
         {
-            return Result<MeasurementLogDto>.Fail("Measurement log not found.");
+            return Result<MeasurementLogDto>.Fail(ErrorMessages.MeasurementLogNotFound);
         }
 
         var user = await _unitOfWork.Users.GetByIdAsync(existingMeasurementLog.UserId);
 
         if (user == null)
         {
-            return Result<MeasurementLogDto>.Fail("User not found.");
+            return Result<MeasurementLogDto>.Fail(ErrorMessages.UserNotFound);
         }
 
-        _mapper.Map(updateMEasurementLogDto, existingMeasurementLog);
+        _mapper.Map(updateMeasurementLogDto, existingMeasurementLog);
 
-        var previous = await _unitOfWork.MeasurementLogs.GetLatestBeforeAsync(existingMeasurementLog.UserId, existingMeasurementLog.Date, ignoreId: id);
+        var previous = await _unitOfWork.MeasurementLogs.GetLatestBeforeAsync(
+            existingMeasurementLog.UserId,
+            existingMeasurementLog.Date,
+            ignoreId: id);
+
         var validation = await _validator.ValidateUpdateAsync(previous, existingMeasurementLog);
         if (!validation.Success)
         {
@@ -108,11 +117,11 @@ public class MeasurementLogService : IMeasurementLogService
 
     public async Task<Result> DeleteAsync(int id)
     {
-        var existingMeasurementLogDto = await _unitOfWork.MeasurementLogs.ExistsAsync(id);
+        var exists = await _unitOfWork.MeasurementLogs.ExistsAsync(id);
 
-        if (!existingMeasurementLogDto)
+        if (!exists)
         {
-            return Result.Fail("Measurement log not found.");
+            return Result.Fail(ErrorMessages.MeasurementLogNotFound);
         }
 
         await _unitOfWork.MeasurementLogs.DeleteAsync(id);

@@ -1,4 +1,5 @@
-﻿using FitnessTracker.Application.DTOs.MeasurementLog;
+﻿using FitnessTracker.Application.Common;
+using FitnessTracker.Application.DTOs.MeasurementLog;
 using FluentValidation;
 
 namespace FitnessTracker.Application.Validators.MeasurementLog;
@@ -8,21 +9,26 @@ public class MeasurementLogValidator : AbstractValidator<MeasurementLogBase>
     public MeasurementLogValidator()
     {
         RuleFor(x => x.Date)
-            .Must(d => d.ToUniversalTime() <= DateTime.UtcNow).WithMessage("Date can't be in the future.");
+            .Must(d => d.ToUniversalTime() <= DateTime.UtcNow)
+            .WithMessage(ErrorMessages.MeasurementLogDateNotInFuture);
 
         RuleFor(x => x.Weight)
-            .GreaterThan(0).WithMessage("Weight must be greater than 0.");
+            .GreaterThan(0).WithMessage(ErrorMessages.MeasurementLogWeightPositive);
 
         RuleFor(x => x.BodyFatPercentage)
-            .InclusiveBetween(2, 60).WithMessage("BodyFatPercentage must be between 2 and 60%.");
+            .InclusiveBetween(2, 60)
+            .WithMessage(ErrorMessages.MeasurementLogBodyFatRange);
 
         RuleFor(x => x.Waist)
-            .InclusiveBetween(10, 250).WithMessage("Waist circumference must be within a realistic range.");
+            .InclusiveBetween(10, 250)
+            .WithMessage(ErrorMessages.MeasurementLogWaistRange);
 
         RuleFor(x => x.Chest)
-            .InclusiveBetween(10, 250).WithMessage("Chest circumference must be within a realistic range.");
+            .InclusiveBetween(10, 250)
+            .WithMessage(ErrorMessages.MeasurementLogChestRange);
 
         RuleFor(x => x.Arms)
-            .InclusiveBetween(10, 250).WithMessage("Arm circumference must be within a realistic range.");
+            .InclusiveBetween(10, 250)
+            .WithMessage(ErrorMessages.MeasurementLogArmsRange);
     }
 }

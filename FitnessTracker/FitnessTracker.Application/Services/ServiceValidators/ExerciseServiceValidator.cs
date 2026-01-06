@@ -1,4 +1,5 @@
-﻿using FitnessTracker.Application.DTOs.Exercise;
+﻿using FitnessTracker.Application.Common;
+using FitnessTracker.Application.DTOs.Exercise;
 using FitnessTracker.Application.Interfaces.Repositories;
 using FitnessTracker.Application.Interfaces.ServiceValidators;
 using FitnessTracker.Application.Results;
@@ -19,11 +20,11 @@ public class ExerciseServiceValidator : IExerciseServiceValidator
         var name = dto.Name;
 
         if (string.IsNullOrWhiteSpace(name))
-            return Result.Fail("Name is required.");
+            return Result.Fail(ErrorMessages.ExerciseNameRequired);
 
         var exists = await _exerciseRepository.ExistsByNameAsync(name);
         if (exists)
-            return Result.Fail("An exercise with the same name already exists.");
+            return Result.Fail(ErrorMessages.ExerciseNameAlreadyExists);
 
         return Result.Ok();
     }
@@ -33,20 +34,20 @@ public class ExerciseServiceValidator : IExerciseServiceValidator
         var name = dto.Name;
 
         if (string.IsNullOrWhiteSpace(name))
-            return Result.Fail("Name is required.");
+            return Result.Fail(ErrorMessages.ExerciseNameRequired);
 
         var exists = await _exerciseRepository.ExistsByNameAsync(name, ignoreExerciseId: id);
         if (exists)
-            return Result.Fail("An exercise with the same name already exists.");
+            return Result.Fail(ErrorMessages.ExerciseNameAlreadyExists);
 
         return Result.Ok();
     }
 
     public async Task<Result> ValidateDeleteAsync(int id)
     {
-        var usedInPast = await _exerciseRepository.IsUsedInPastWorkoutsAsync(id, DateTime.Now);
+        var usedInPast = await _exerciseRepository.IsUsedInPastWorkoutsAsync(id, DateTime.UtcNow);
         if (usedInPast)
-            return Result.Fail("Exercise can't be deleted because it belongs to previous workouts.");
+            return Result.Fail(ErrorMessages.ExerciseCannotDeleteUsedInPastWorkouts);
 
         return Result.Ok();
     }

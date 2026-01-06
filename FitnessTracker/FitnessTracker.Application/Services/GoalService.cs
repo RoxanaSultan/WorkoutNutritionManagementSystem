@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FitnessTracker.Application.Common;
 using FitnessTracker.Application.DTOs.Goal;
 using FitnessTracker.Application.Interfaces.Repositories;
 using FitnessTracker.Application.Interfaces.Services;
@@ -13,6 +14,7 @@ public class GoalService : IGoalService
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     private readonly IGoalServiceValidator _goalServiceValidator;
+
     public GoalService(IUnitOfWork unitOfWork, IMapper mapper, IGoalServiceValidator goalServiceValidator)
     {
         _unitOfWork = unitOfWork;
@@ -34,7 +36,7 @@ public class GoalService : IGoalService
 
         if (goal == null)
         {
-            return Result<GoalDto>.Fail("Goal not found.");
+            return Result<GoalDto>.Fail(ErrorMessages.GoalNotFound);
         }
 
         var goalDto = _mapper.Map<GoalDto>(goal);
@@ -48,7 +50,8 @@ public class GoalService : IGoalService
 
         if (user == null)
         {
-            return Result<GoalDto>.Fail($"User with id {createGoalDto.UserId} not found.");
+            return Result<GoalDto>.Fail(ErrorMessages.UserWithIdNotFound(createGoalDto.UserId));
+            // sau, fără id: return Result<GoalDto>.Fail(ErrorMessages.UserNotFound);
         }
 
         var validation = await _goalServiceValidator.ValidateCreateAsync(user, createGoalDto);
@@ -73,13 +76,13 @@ public class GoalService : IGoalService
         var existingGoal = await _unitOfWork.Goals.GetByIdAsync(id);
 
         if (existingGoal == null)
-            return Result<GoalDto>.Fail("Goal not found.");
+            return Result<GoalDto>.Fail(ErrorMessages.GoalNotFound);
 
         var user = await _unitOfWork.Users.GetByIdAsync(existingGoal.UserId);
 
         if (user == null)
         {
-            return Result<GoalDto>.Fail("User not found.");
+            return Result<GoalDto>.Fail(ErrorMessages.UserNotFound);
         }
 
         var validation = await _goalServiceValidator.ValidateUpdateAsync(user, updateGoalDto, id);
@@ -99,14 +102,13 @@ public class GoalService : IGoalService
         return Result<GoalDto>.Ok(goalDto);
     }
 
-
     public async Task<Result> DeleteAsync(int id)
     {
-        var goal = await _unitOfWork.Goals.ExistsAsync(id);
+        var exists = await _unitOfWork.Goals.ExistsAsync(id);
 
-        if (!goal)
+        if (!exists)
         {
-            return Result<GoalDto>.Fail("Goal not found.");
+            return Result.Fail(ErrorMessages.GoalNotFound);
         }
 
         await _unitOfWork.Goals.DeleteAsync(id);

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FitnessTracker.Application.Common;
 using FitnessTracker.Application.DTOs.Workout;
 using FitnessTracker.Application.DTOs.WorkoutExercise;
 using FitnessTracker.Application.Interfaces.Repositories;
@@ -39,7 +40,7 @@ public class WorkoutService : IWorkoutService
 
         if (workout == null)
         {
-            return Result<WorkoutDto>.Fail("Workout not found.");
+            return Result<WorkoutDto>.Fail(ErrorMessages.WorkoutNotFound);
         }
 
         return Result<WorkoutDto>.Ok(_mapper.Map<WorkoutDto>(workout));
@@ -51,7 +52,7 @@ public class WorkoutService : IWorkoutService
 
         if (user == null)
         {
-            return Result<WorkoutDto>.Fail($"User with id {createWorkoutDto.UserId} not found.");
+            return Result<WorkoutDto>.Fail(ErrorMessages.UserWithIdNotFound(createWorkoutDto.UserId));
         }
 
         var validation = await _validator.ValidateCreateAsync(user, createWorkoutDto);
@@ -75,13 +76,13 @@ public class WorkoutService : IWorkoutService
         var existingWorkout = await _unitOfWork.Workouts.GetByIdAsync(id);
         if (existingWorkout == null)
         {
-            return Result<WorkoutDto>.Fail("Workout not found.");
+            return Result<WorkoutDto>.Fail(ErrorMessages.WorkoutNotFound);
         }
 
         var user = await _unitOfWork.Users.GetByIdAsync(existingWorkout.UserId);
         if (user == null)
         {
-            return Result<WorkoutDto>.Fail("User not found.");
+            return Result<WorkoutDto>.Fail(ErrorMessages.UserNotFound);
         }
 
         var validation = await _validator.ValidateUpdateAsync(user, updateWorkoutDto, id);
@@ -102,14 +103,18 @@ public class WorkoutService : IWorkoutService
 
     public async Task<Result> DeleteAsync(int id)
     {
-        var workout = await _unitOfWork.Workouts.ExistsAsync(id);
-        if (!workout)
+        var exists = await _unitOfWork.Workouts.ExistsAsync(id);
+        if (!exists)
         {
-            return Result.Fail("Workout not found.");
+            return Result.Fail(ErrorMessages.WorkoutNotFound);
         }
 
+        // Presupunere: metoda asta șterge workout-exercises pentru workoutId-urile date.
         await _unitOfWork.Workouts.DeleteByWorkoutIdsAsync(new[] { id });
+
+        // Șterge workout-ul
         await _unitOfWork.Workouts.DeleteAsync(id);
+
         await _unitOfWork.SaveChangesAsync();
 
         return Result.Ok();
@@ -117,10 +122,11 @@ public class WorkoutService : IWorkoutService
 
     public async Task<Result<IEnumerable<WorkoutExerciseDto>>> GetExercisesByWorkout(int workoutId)
     {
-        var workout = await _unitOfWork.Exercises.GetByIdAsync(workoutId);
+        // FIX: era _unitOfWork.Exercises.GetByIdAsync(workoutId)
+        var workout = await _unitOfWork.Workouts.GetByIdAsync(workoutId);
         if (workout == null)
         {
-            return Result<IEnumerable<WorkoutExerciseDto>>.Fail("Workout not found.");
+            return Result<IEnumerable<WorkoutExerciseDto>>.Fail(ErrorMessages.WorkoutNotFound);
         }
 
         var workoutExercises = await _unitOfWork.Workouts.GetWorkoutExercisesByWorkoutIdAsync(workoutId);
@@ -134,19 +140,19 @@ public class WorkoutService : IWorkoutService
         var workout = await _unitOfWork.Workouts.GetByIdAsync(workoutId);
         if (workout == null)
         {
-            return Result.Fail("Workout not found.");
+            return Result.Fail(ErrorMessages.WorkoutNotFound);
         }
 
         var exercise = await _unitOfWork.Exercises.GetByIdAsync(dto.ExerciseId);
         if (exercise == null)
         {
-            return Result.Fail("Exercise not found.");
+            return Result.Fail(ErrorMessages.ExerciseNotFound);
         }
 
         var exists = await _unitOfWork.Workouts.WorkoutExerciseExistsAsync(workoutId, dto.ExerciseId);
         if (exists)
         {
-            return Result.Fail("This exercise is already added to the workout.");
+            return Result.Fail(ErrorMessages.WorkoutExerciseAlreadyAdded);
         }
 
         var entity = _mapper.Map<WorkoutExercise>(dto);
@@ -162,7 +168,7 @@ public class WorkoutService : IWorkoutService
         var existing = await _unitOfWork.Workouts.GetWorkoutExerciseAsync(workoutId, exerciseId);
         if (existing == null)
         {
-            return Result.Fail("Workout exercise not found.");
+            return Result.Fail(ErrorMessages.WorkoutExerciseNotFound);
         }
 
         existing.Sets = dto.Sets;
@@ -180,7 +186,7 @@ public class WorkoutService : IWorkoutService
         var existing = await _unitOfWork.Workouts.GetWorkoutExerciseAsync(workoutId, exerciseId);
         if (existing == null)
         {
-            return Result.Fail("Workout exercise not found.");
+            return Result.Fail(ErrorMessages.WorkoutExerciseNotFound);
         }
 
         await _unitOfWork.Workouts.RemoveWorkoutExerciseAsync(existing);

@@ -1,4 +1,5 @@
-﻿using FitnessTracker.Application.DTOs.Workout;
+﻿using FitnessTracker.Application.Common;
+using FitnessTracker.Application.DTOs.Workout;
 using FitnessTracker.Application.Interfaces.Repositories;
 using FitnessTracker.Application.Interfaces.ServiceValidators;
 using FitnessTracker.Application.Results;
@@ -23,14 +24,14 @@ public class WorkoutServiceValidator : IWorkoutServiceValidator
         var dateToMinute = TruncateToMinute(dto.Date);
 
         if (dateToMinute > DateTime.Now)
-            return Result.Fail("Workout date cannot be in the future.");
+            return Result.Fail(ErrorMessages.WorkoutDateNotInFuture);
 
         if (dateToMinute < user.RegistrationDate)
-            return Result.Fail("Workout date must be greater than or equal to user's registration date.");
+            return Result.Fail(ErrorMessages.WorkoutDateBeforeUserRegistration);
 
         var exists = await _workoutRepository.ExistsSameStartTimeAsync(dto.UserId, dateToMinute);
         if (exists)
-            return Result.Fail("User cannot log more than one workout with the same start time.");
+            return Result.Fail(ErrorMessages.WorkoutSameStartTimeNotAllowed);
 
         return Result.Ok();
     }
@@ -40,14 +41,16 @@ public class WorkoutServiceValidator : IWorkoutServiceValidator
         var dateToMinute = TruncateToMinute(dto.Date);
 
         if (dateToMinute > DateTime.Now)
-            return Result.Fail("Workout date cannot be in the future.");
+            return Result.Fail(ErrorMessages.WorkoutDateNotInFuture);
 
         if (dateToMinute < user.RegistrationDate)
-            return Result.Fail("Workout date must be greater than or equal to user's registration date.");
+            return Result.Fail(ErrorMessages.WorkoutDateBeforeUserRegistration);
 
-        var exists = await _workoutRepository.ExistsSameStartTimeAsync(user.Id, dateToMinute, ignoreWorkoutId: workoutId);
+        var exists = await _workoutRepository.ExistsSameStartTimeAsync(
+            user.Id, dateToMinute, ignoreWorkoutId: workoutId);
+
         if (exists)
-            return Result.Fail("User cannot log more than one workout with the same start time.");
+            return Result.Fail(ErrorMessages.WorkoutSameStartTimeNotAllowed);
 
         return Result.Ok();
     }

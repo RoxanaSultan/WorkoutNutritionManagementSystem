@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FitnessTracker.Application.Common;
 using FitnessTracker.Application.DTOs.FoodLog;
 using FitnessTracker.Application.Interfaces.Repositories;
 using FitnessTracker.Application.Interfaces.Services;
@@ -38,7 +39,7 @@ public class FoodLogService : IFoodLogService
 
         if (foodLog == null)
         {
-            return Result<FoodLogDto>.Fail("Food log not found.");
+            return Result<FoodLogDto>.Fail(ErrorMessages.FoodLogNotFound);
         }
 
         var foodLogDto = _mapper.Map<FoodLogDto>(foodLog);
@@ -52,7 +53,11 @@ public class FoodLogService : IFoodLogService
 
         if (user == null)
         {
-            return Result<FoodLogDto>.Fail($"User with id {createFoodLogDto.UserId} not found.");
+            // varianta cu id (dacă adaugi metoda statică în ErrorMessages)
+            return Result<FoodLogDto>.Fail(ErrorMessages.UserWithIdNotFound(createFoodLogDto.UserId));
+
+            // sau, dacă vrei fără id:
+            // return Result<FoodLogDto>.Fail(ErrorMessages.UserNotFound);
         }
 
         var validation = await _foodLogServiceValidator.ValidateCreateAsync(user, createFoodLogDto);
@@ -78,21 +83,21 @@ public class FoodLogService : IFoodLogService
 
         if (existingFoodLog == null)
         {
-            return Result<FoodLogDto>.Fail("Food log not found.");
+            return Result<FoodLogDto>.Fail(ErrorMessages.FoodLogNotFound);
         }
 
         var user = await _unitOfWork.Users.GetByIdAsync(existingFoodLog.UserId);
 
         if (user == null)
         {
-            return Result<FoodLogDto>.Fail("User not found.");
+            return Result<FoodLogDto>.Fail(ErrorMessages.UserNotFound);
         }
 
         var foodItem = await _unitOfWork.FoodItems.GetByIdAsync(existingFoodLog.FoodId);
 
         if (foodItem == null)
         {
-            return Result<FoodLogDto>.Fail("Food item not found.");
+            return Result<FoodLogDto>.Fail(ErrorMessages.FoodItemNotFound);
         }
 
         var validation = await _foodLogServiceValidator.ValidateUpdateAsync(user, updateFoodLogDto);
@@ -114,11 +119,11 @@ public class FoodLogService : IFoodLogService
 
     public async Task<Result> DeleteAsync(int id)
     {
-        var foodLog = await _unitOfWork.FoodLogs.ExistsAsync(id);
+        var exists = await _unitOfWork.FoodLogs.ExistsAsync(id);
 
-        if (foodLog == null)
+        if (!exists)
         {
-            return Result.Fail("Food log not found.");
+            return Result.Fail(ErrorMessages.FoodLogNotFound);
         }
 
         await _unitOfWork.FoodLogs.DeleteAsync(id);

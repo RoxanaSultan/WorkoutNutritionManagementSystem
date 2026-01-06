@@ -1,4 +1,5 @@
-﻿using FitnessTracker.Application.Interfaces.Repositories;
+﻿using FitnessTracker.Application.Common;
+using FitnessTracker.Application.Interfaces.Repositories;
 using FitnessTracker.Application.Interfaces.ServiceValidators;
 using FitnessTracker.Application.Results;
 
@@ -17,21 +18,19 @@ public class UserServiceValidator : IUserServiceValidator
     {
         var isUnique = await IsEmailUniqueAsync(email);
         if (!isUnique)
-            return Result.Fail($"User with email {email} already exists.");
+        {
+            return Result.Fail(ErrorMessages.UserEmailAlreadyExists);
+        }
 
         return Result.Ok();
     }
 
     public async Task<Result> ValidateUpdateUserAsync(int id, string email)
     {
-        //var userExists = await DoesUserExistAsync(id);
-        //if (!userExists)
-        //    return Result.Fail("User not found.");
-
         var isUnique = await IsEmailUniqueForUpdateAsync(id, email);
         if (!isUnique)
         {
-            return Result.Fail($"User with email {email} already exists.");
+            return Result.Fail(ErrorMessages.UserEmailAlreadyExists);
         }
 
         return Result.Ok();

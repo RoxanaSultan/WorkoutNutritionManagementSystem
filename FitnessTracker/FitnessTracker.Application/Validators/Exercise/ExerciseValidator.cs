@@ -1,4 +1,5 @@
-﻿using FitnessTracker.Application.Constants;
+﻿using FitnessTracker.Application.Common;
+using FitnessTracker.Application.Constants;
 using FitnessTracker.Application.DTOs.Exercise;
 using FluentValidation;
 
@@ -9,19 +10,20 @@ public class ExerciseValidator : AbstractValidator<ExerciseBase>
     public ExerciseValidator()
     {
         RuleFor(x => x.Name)
-            .NotEmpty().WithMessage("Name is required.")
-            .MaximumLength(100).WithMessage("Name cannot exceed 100 characters.");
+            .NotEmpty().WithMessage(ErrorMessages.ExerciseNameRequired)
+            .MaximumLength(100).WithMessage(ErrorMessages.ExerciseNameMaxLength100);
 
         RuleFor(x => x.MuscleGroup)
             .Must(BeValidMuscleGroup)
-            .WithMessage("MuscleGroup must be one of: back, chest, arms, shoulders, legs, abdomen.")
+            .WithMessage(ErrorMessages.ExerciseMuscleGroupInvalid)
             .When(x => !string.IsNullOrWhiteSpace(x.MuscleGroup));
 
         RuleFor(x => x.DifficultyLevel)
             .Must(BeValidDifficulty)
-            .WithMessage("DifficultyLevel must be one of: beginner, intermediate, advanced.")
+            .WithMessage(ErrorMessages.ExerciseDifficultyLevelInvalid)
             .When(x => !string.IsNullOrWhiteSpace(x.DifficultyLevel));
     }
+
     private static bool BeValidMuscleGroup(string? value)
         => value != null && ExerciseOptions.MuscleGroups.Contains(value.Trim());
 

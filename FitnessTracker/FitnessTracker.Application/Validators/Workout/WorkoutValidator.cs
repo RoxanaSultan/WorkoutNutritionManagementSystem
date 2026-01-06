@@ -1,4 +1,5 @@
-﻿using FitnessTracker.Application.DTOs.Workout;
+﻿using FitnessTracker.Application.Common;
+using FitnessTracker.Application.DTOs.Workout;
 using FluentValidation;
 
 namespace FitnessTracker.Application.Validators.Workout;
@@ -9,19 +10,19 @@ public class WorkoutValidator : AbstractValidator<WorkoutBase>
     {
         RuleFor(x => x.Date)
             .NotEmpty()
-            .WithMessage("Workout date is required.")
+            .WithMessage(ErrorMessages.WorkoutDateRequired)
             .Must(NotBeInFuture)
-            .WithMessage("Workout date cannot be in the future.");
+            .WithMessage(ErrorMessages.WorkoutDateNotInFuture);
 
         RuleFor(x => x.DurationInMinutes)
             .GreaterThan(0)
-            .WithMessage("Duration must be a positive number.")
+            .WithMessage(ErrorMessages.WorkoutDurationPositive)
             .InclusiveBetween(5, 300)
-            .WithMessage("Duration must be between 5 and 300 minutes.");
+            .WithMessage(ErrorMessages.WorkoutDurationRange);
 
         RuleFor(x => x.Notes)
             .MaximumLength(500)
-            .WithMessage("Notes cannot exceed 500 characters.");
+            .WithMessage(ErrorMessages.WorkoutNotesMaxLength500);
     }
 
     private bool NotBeInFuture(DateTime date)

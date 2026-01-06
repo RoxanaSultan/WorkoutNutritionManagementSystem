@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FitnessTracker.Application.Common;
 using FitnessTracker.Application.DTOs.User;
 using FitnessTracker.Application.Interfaces.Repositories;
 using FitnessTracker.Application.Interfaces.Services;
@@ -35,7 +36,7 @@ public class UserService : IUserService
 
         if (user == null)
         {
-            return Result<UserDto>.Fail("User not found.");
+            return Result<UserDto>.Fail(ErrorMessages.UserNotFound);
         }
 
         var userDto = _mapper.Map<UserDto>(user);
@@ -67,7 +68,7 @@ public class UserService : IUserService
 
         if (existingUser == null)
         {
-            return Result<UserDto>.Fail("User not found.");
+            return Result<UserDto>.Fail(ErrorMessages.UserNotFound);
         }
 
         var validationResult = await _userServiceValidator.ValidateUpdateUserAsync(id, updateUserDto.Email);
@@ -93,7 +94,7 @@ public class UserService : IUserService
 
         if (!user)
         {
-            return Result.Fail("User not found.");
+            return Result.Fail(ErrorMessages.UserNotFound);
         }
 
         var workoutIds = await _unitOfWork.Workouts.GetWorkoutIdsByUserIdAsync(id);
