@@ -12,4 +12,7 @@ public interface IWorkoutRepository : IGenericRepository<Workout>
     Task<WorkoutExercise?> GetWorkoutExerciseAsync(int workoutId, int exerciseId);
     Task UpdateWorkoutExerciseAsync(WorkoutExercise entity);
     Task RemoveWorkoutExerciseAsync(WorkoutExercise workoutExercise);
+    Task<List<int>> GetWorkoutIdsByUserIdAsync(int userId);
+    Task DeleteByUserIdAsync(int userId);
+    Task DeleteByWorkoutIdsAsync(IEnumerable<int> workoutIds);
 }

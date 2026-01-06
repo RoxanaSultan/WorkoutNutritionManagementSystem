@@ -29,12 +29,14 @@ public class WorkoutService : IWorkoutService
     {
         var workouts = await _unitOfWork.Workouts.GetAllAsync();
         var workoutDtos = _mapper.Map<IEnumerable<WorkoutDto>>(workouts);
+
         return Result<IEnumerable<WorkoutDto>>.Ok(workoutDtos);
     }
 
     public async Task<Result<WorkoutDto>> GetByIdAsync(int id)
     {
         var workout = await _unitOfWork.Workouts.GetByIdAsync(id);
+
         if (workout == null)
         {
             return Result<WorkoutDto>.Fail("Workout not found.");
@@ -46,12 +48,14 @@ public class WorkoutService : IWorkoutService
     public async Task<Result<WorkoutDto>> CreateAsync(CreateWorkoutDto createWorkoutDto)
     {
         var user = await _unitOfWork.Users.GetByIdAsync(createWorkoutDto.UserId);
+
         if (user == null)
         {
             return Result<WorkoutDto>.Fail($"User with id {createWorkoutDto.UserId} not found.");
         }
 
         var validation = await _validator.ValidateCreateAsync(user, createWorkoutDto);
+
         if (!validation.Success)
         {
             return Result<WorkoutDto>.Fail(validation.Error);
@@ -62,6 +66,7 @@ public class WorkoutService : IWorkoutService
         await _unitOfWork.SaveChangesAsync();
 
         var workoutDto = _mapper.Map<WorkoutDto>(workout);
+
         return Result<WorkoutDto>.Ok(workoutDto);
     }
 
@@ -86,26 +91,28 @@ public class WorkoutService : IWorkoutService
         }
 
         _mapper.Map(updateWorkoutDto, existingWorkout);
+
         await _unitOfWork.Workouts.UpdateAsync(existingWorkout);
         await _unitOfWork.SaveChangesAsync();
 
         var workoutDto = _mapper.Map<WorkoutDto>(existingWorkout);
+
         return Result<WorkoutDto>.Ok(workoutDto);
     }
 
-    public async Task<Result<WorkoutDto>> DeleteAsync(int id)
+    public async Task<Result> DeleteAsync(int id)
     {
-        var workout = await _unitOfWork.Workouts.GetByIdAsync(id);
-        if (workout == null)
+        var workout = await _unitOfWork.Workouts.ExistsAsync(id);
+        if (!workout)
         {
-            return Result<WorkoutDto>.Fail("Workout not found.");
+            return Result.Fail("Workout not found.");
         }
 
+        await _unitOfWork.Workouts.DeleteByWorkoutIdsAsync(new[] { id });
         await _unitOfWork.Workouts.DeleteAsync(id);
         await _unitOfWork.SaveChangesAsync();
 
-        var workoutDto = _mapper.Map<WorkoutDto>(workout);
-        return Result<WorkoutDto>.Ok(workoutDto);
+        return Result.Ok();
     }
 
     public async Task<Result<IEnumerable<WorkoutExerciseDto>>> GetExercisesByWorkout(int workoutId)

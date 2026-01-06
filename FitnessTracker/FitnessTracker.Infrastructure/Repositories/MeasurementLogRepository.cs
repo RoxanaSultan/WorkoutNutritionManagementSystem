@@ -14,6 +14,13 @@ public class MeasurementLogRepository : GenericRepository<MeasurementLog>, IMeas
         _context = context;
     }
 
+    public async Task DeleteByUserIdAsync(int userId)
+    {
+        await _context.MeasurementLogs
+            .Where(ml => ml.UserId == userId)
+            .ExecuteDeleteAsync();
+    }
+
     public async Task<MeasurementLog?> GetLatestBeforeAsync(int userId, DateTime date, int? ignoreId = null)
     {
         var q = _context.MeasurementLogs

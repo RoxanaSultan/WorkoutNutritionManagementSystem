@@ -19,7 +19,17 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
 
     public async Task<T?> GetByIdAsync(int id)
     {
-        return await _context.Set<T>().FindAsync(id);
+        return await _context
+            .Set<T>()
+            .AsNoTracking()
+            .FirstOrDefaultAsync(e => EF.Property<int>(e, "Id") == id);
+    }
+
+    public async Task<bool> ExistsAsync(int id)
+    {
+        return await _context
+            .Set<T>()
+            .AnyAsync(e => EF.Property<int>(e, "Id") == id);
     }
 
     public async Task CreateAsync(T entity)
@@ -34,16 +44,9 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
 
     public async Task DeleteAsync(int id)
     {
-        try
-        {
-            await _context
-                .Set<T>()
-                .Where(e => EF.Property<int>(e, "Id") == id)
-                .ExecuteDeleteAsync();
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e.Message);
-        }
+        await _context
+            .Set<T>()
+            .Where(e => EF.Property<int>(e, "Id") == id)
+            .ExecuteDeleteAsync();
     }
 }

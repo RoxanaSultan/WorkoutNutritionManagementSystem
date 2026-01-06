@@ -25,24 +25,28 @@ public class UserService : IUserService
     {
         var users = await _unitOfWork.Users.GetAllAsync();
         var userDtos = _mapper.Map<IEnumerable<UserDto>>(users);
+        
         return Result<IEnumerable<UserDto>>.Ok(userDtos);
     }
 
     public async Task<Result<UserDto>> GetByIdAsync(int id)
     {
         var user = await _unitOfWork.Users.GetByIdAsync(id);
+
         if (user == null)
         {
             return Result<UserDto>.Fail("User not found.");
         }
 
         var userDto = _mapper.Map<UserDto>(user);
+
         return Result<UserDto>.Ok(userDto);
     }
 
     public async Task<Result<UserDto>> CreateAsync(CreateUserDto createUserDto)
     {
         var validation = await _userServiceValidator.ValidateCreateUserAsync(createUserDto.Email);
+
         if (!validation.Success)
         {
             return Result<UserDto>.Fail(validation.Error!);
@@ -53,43 +57,59 @@ public class UserService : IUserService
         await _unitOfWork.SaveChangesAsync();
 
         var userDto = _mapper.Map<UserDto>(user);
+
         return Result<UserDto>.Ok(userDto);
     }
 
     public async Task<Result<UserDto>> UpdateAsync(int id, UpdateUserDto updateUserDto)
     {
         var existingUser = await _unitOfWork.Users.GetByIdAsync(id);
+
         if (existingUser == null)
         {
             return Result<UserDto>.Fail("User not found.");
         }
 
         var validationResult = await _userServiceValidator.ValidateUpdateUserAsync(id, updateUserDto.Email);
+
         if (!validationResult.Success)
         {
             return Result<UserDto>.Fail(validationResult.Error!);
         }
 
         _mapper.Map(updateUserDto, existingUser);
+
         await _unitOfWork.Users.UpdateAsync(existingUser);
         await _unitOfWork.SaveChangesAsync();
 
         var userDto = _mapper.Map<UserDto>(existingUser);
+
         return Result<UserDto>.Ok(userDto);
     }
 
-    public async Task<Result<UserDto>> DeleteAsync(int id)
+    public async Task<Result> DeleteAsync(int id)
     {
-        var user = await _unitOfWork.Users.GetByIdAsync(id);
-        if (user == null)
+        var user = await _unitOfWork.Users.ExistsAsync(id);
+
+        if (!user)
         {
             return Result<UserDto>.Fail("User not found.");
         }
 
+        var workoutIds = await _unitOfWork.Workouts.GetWorkoutIdsByUserIdAsync(id);
+        if (workoutIds.Count > 0)
+        {
+            await _unitOfWork.Workouts.DeleteByWorkoutIdsAsync(workoutIds);
+        }
+
+        await _unitOfWork.Workouts.DeleteByUserIdAsync(id);
+        await _unitOfWork.FoodLogs.DeleteByUserIdAsync(id);
+        await _unitOfWork.Goals.DeleteByUserIdAsync(id);
+        await _unitOfWork.MeasurementLogs.DeleteByUserIdAsync(id);
+
         await _unitOfWork.Users.DeleteAsync(id);
         await _unitOfWork.SaveChangesAsync();
 
-        var userDto = _mapper.Map<UserDto>(user);
-        return Result<UserDto>.Ok(userDto);
+        return Result.Ok();
     }
 }

@@ -16,6 +16,13 @@ public class GoalRepository :
         _context = context;
     }
 
+    public async Task DeleteByUserIdAsync(int userId)
+    {
+        await _context.Goals
+            .Where(g => g.UserId == userId)
+            .ExecuteDeleteAsync();
+    }
+
     public async Task<bool> ExistsOverlappingGoalAsync(
         int userId,
         string goalType,

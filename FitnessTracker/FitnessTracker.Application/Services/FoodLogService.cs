@@ -28,89 +28,102 @@ public class FoodLogService : IFoodLogService
     {
         var foodLogs = await _unitOfWork.FoodLogs.GetAllAsync();
         var foodLogDtos = _mapper.Map<IEnumerable<FoodLogDto>>(foodLogs);
+
         return Result<IEnumerable<FoodLogDto>>.Ok(foodLogDtos);
     }
 
     public async Task<Result<FoodLogDto>> GetByIdAsync(int id)
     {
         var foodLog = await _unitOfWork.FoodLogs.GetByIdAsync(id);
+
         if (foodLog == null)
         {
             return Result<FoodLogDto>.Fail("Food log not found.");
         }
 
         var foodLogDto = _mapper.Map<FoodLogDto>(foodLog);
+
         return Result<FoodLogDto>.Ok(foodLogDto);
     }
 
     public async Task<Result<FoodLogDto>> CreateAsync(CreateFoodLogDto createFoodLogDto)
     {
         var user = await _unitOfWork.Users.GetByIdAsync(createFoodLogDto.UserId);
+
         if (user == null)
         {
             return Result<FoodLogDto>.Fail($"User with id {createFoodLogDto.UserId} not found.");
         }
 
         var validation = await _foodLogServiceValidator.ValidateCreateAsync(user, createFoodLogDto);
+
         if (!validation.Success)
         {
             return Result<FoodLogDto>.Fail(validation.Error);
         }
 
         var foodLog = _mapper.Map<FoodLog>(createFoodLogDto);
+
         await _unitOfWork.FoodLogs.CreateAsync(foodLog);
         await _unitOfWork.SaveChangesAsync();
 
         var foodLogDto = _mapper.Map<FoodLogDto>(foodLog);
+
         return Result<FoodLogDto>.Ok(foodLogDto);
     }
 
     public async Task<Result<FoodLogDto>> UpdateAsync(int id, UpdateFoodLogDto updateFoodLogDto)
     {
         var existingFoodLog = await _unitOfWork.FoodLogs.GetByIdAsync(id);
+
         if (existingFoodLog == null)
         {
             return Result<FoodLogDto>.Fail("Food log not found.");
         }
 
         var user = await _unitOfWork.Users.GetByIdAsync(existingFoodLog.UserId);
+
         if (user == null)
         {
             return Result<FoodLogDto>.Fail("User not found.");
         }
 
         var foodItem = await _unitOfWork.FoodItems.GetByIdAsync(existingFoodLog.FoodId);
+
         if (foodItem == null)
         {
             return Result<FoodLogDto>.Fail("Food item not found.");
         }
 
         var validation = await _foodLogServiceValidator.ValidateUpdateAsync(user, updateFoodLogDto);
+
         if (!validation.Success)
         {
             return Result<FoodLogDto>.Fail(validation.Error);
         }
 
         _mapper.Map(updateFoodLogDto, existingFoodLog);
+
         await _unitOfWork.FoodLogs.UpdateAsync(existingFoodLog);
         await _unitOfWork.SaveChangesAsync();
 
         var foodLogDto = _mapper.Map<FoodLogDto>(existingFoodLog);
+
         return Result<FoodLogDto>.Ok(foodLogDto);
     }
 
-    public async Task<Result<FoodLogDto>> DeleteAsync(int id)
+    public async Task<Result> DeleteAsync(int id)
     {
-        var foodLog = await _unitOfWork.FoodLogs.GetByIdAsync(id);
+        var foodLog = await _unitOfWork.FoodLogs.ExistsAsync(id);
+
         if (foodLog == null)
         {
-            return Result<FoodLogDto>.Fail("Food log not found.");
+            return Result.Fail("Food log not found.");
         }
 
         await _unitOfWork.FoodLogs.DeleteAsync(id);
         await _unitOfWork.SaveChangesAsync();
 
-        var foodLogDto = _mapper.Map<FoodLogDto>(foodLog);
-        return Result<FoodLogDto>.Ok(foodLogDto);
+        return Result.Ok();
     }
 }

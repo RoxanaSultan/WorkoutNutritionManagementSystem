@@ -25,63 +25,80 @@ public class ExerciseService : IExerciseService
     {
         var exercises = await _unitOfWork.Exercises.GetAllAsync();
         var exerciseDtos = _mapper.Map<IEnumerable<ExerciseDto>>(exercises);
+
         return Result<IEnumerable<ExerciseDto>>.Ok(exerciseDtos);
     }
 
     public async Task<Result<ExerciseDto>> GetByIdAsync(int id)
     {
-        var entity = await _unitOfWork.Exercises.GetByIdAsync(id);
-        if (entity == null) return Result<ExerciseDto>.Fail("Exercise not found.");
-        return Result<ExerciseDto>.Ok(_mapper.Map<ExerciseDto>(entity));
+        var exercise = await _unitOfWork.Exercises.GetByIdAsync(id);
+
+        if (exercise == null)
+        {
+            return Result<ExerciseDto>.Fail("Exercise not found.");
+        }
+
+        var exerciseDto = _mapper.Map<ExerciseDto>(exercise);
+
+        return Result<ExerciseDto>.Ok(exerciseDto);
     }
 
     public async Task<Result<ExerciseDto>> CreateAsync(CreateExerciseDto createExerciseDto)
     {
         var validation = await _validator.ValidateCreateAsync(createExerciseDto);
+
         if (!validation.Success)
         {
             return Result<ExerciseDto>.Fail(validation.Error);
         }
 
         var exercise = _mapper.Map<Exercise>(createExerciseDto);
+
         await _unitOfWork.Exercises.CreateAsync(exercise);
         await _unitOfWork.SaveChangesAsync();
 
         var exerciseDto = _mapper.Map<ExerciseDto>(exercise);
+
         return Result<ExerciseDto>.Ok(exerciseDto);
     }
 
     public async Task<Result<ExerciseDto>> UpdateAsync(int id, UpdateExerciseDto updateExerciseDto)
     {
         var existingExercise = await _unitOfWork.Exercises.GetByIdAsync(id);
+
         if (existingExercise == null)
         {
             return Result<ExerciseDto>.Fail("Exercise not found.");
         }
 
         var validation = await _validator.ValidateUpdateAsync(id, updateExerciseDto);
+
         if (!validation.Success)
         {
             return Result<ExerciseDto>.Fail(validation.Error);
         }
 
         _mapper.Map(updateExerciseDto, existingExercise);
+
         await _unitOfWork.Exercises.UpdateAsync(existingExercise);
         await _unitOfWork.SaveChangesAsync();
 
         var exerciseDto = _mapper.Map<ExerciseDto>(existingExercise);
+
         return Result<ExerciseDto>.Ok(exerciseDto);
     }
 
     public async Task<Result> DeleteAsync(int id)
     {
-        var existingExercise = await _unitOfWork.Exercises.GetByIdAsync(id);
-        if (existingExercise == null)
+        var existingExercise = await _unitOfWork.Exercises.ExistsAsync(id);
+
+        if (!existingExercise)
         {
             return Result.Fail("Exercise not found.");
         }
 
         var validation = await _validator.ValidateDeleteAsync(id);
+
         if (!validation.Success)
         {
             return Result.Fail(validation.Error);
@@ -89,6 +106,7 @@ public class ExerciseService : IExerciseService
 
         await _unitOfWork.Exercises.DeleteAsync(id);
         await _unitOfWork.SaveChangesAsync();
+
         return Result.Ok();
     }
 }

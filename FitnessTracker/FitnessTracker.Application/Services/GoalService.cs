@@ -24,74 +24,87 @@ public class GoalService : IGoalService
     {
         var goals = await _unitOfWork.Goals.GetAllAsync();
         var goalsDto = _mapper.Map<IEnumerable<GoalDto>>(goals);
+
         return Result<IEnumerable<GoalDto>>.Ok(goalsDto);
     }
 
     public async Task<Result<GoalDto>> GetByIdAsync(int id)
     {
         var goal = await _unitOfWork.Goals.GetByIdAsync(id);
+
         if (goal == null)
         {
             return Result<GoalDto>.Fail("Goal not found.");
         }
 
         var goalDto = _mapper.Map<GoalDto>(goal);
+
         return Result<GoalDto>.Ok(goalDto);
     }
 
     public async Task<Result<GoalDto>> CreateAsync(CreateGoalDto createGoalDto)
     {
         var user = await _unitOfWork.Users.GetByIdAsync(createGoalDto.UserId);
+
         if (user == null)
         {
             return Result<GoalDto>.Fail($"User with id {createGoalDto.UserId} not found.");
         }
 
         var validation = await _goalServiceValidator.ValidateCreateAsync(user, createGoalDto);
+
         if (!validation.Success)
         {
             return Result<GoalDto>.Fail(validation.Error);
         }
 
         var goal = _mapper.Map<Goal>(createGoalDto);
+
         await _unitOfWork.Goals.CreateAsync(goal);
         await _unitOfWork.SaveChangesAsync();
 
         var goalDto = _mapper.Map<GoalDto>(goal);
+
         return Result<GoalDto>.Ok(goalDto);
     }
 
     public async Task<Result<GoalDto>> UpdateAsync(int id, UpdateGoalDto updateGoalDto)
     {
         var existingGoal = await _unitOfWork.Goals.GetByIdAsync(id);
+
         if (existingGoal == null)
             return Result<GoalDto>.Fail("Goal not found.");
 
         var user = await _unitOfWork.Users.GetByIdAsync(existingGoal.UserId);
+
         if (user == null)
         {
             return Result<GoalDto>.Fail("User not found.");
         }
 
         var validation = await _goalServiceValidator.ValidateUpdateAsync(user, updateGoalDto, id);
+
         if (!validation.Success)
         {
             return Result<GoalDto>.Fail(validation.Error);
         }
 
         _mapper.Map(updateGoalDto, existingGoal);
+
         await _unitOfWork.Goals.UpdateAsync(existingGoal);
         await _unitOfWork.SaveChangesAsync();
 
         var goalDto = _mapper.Map<GoalDto>(existingGoal);
+
         return Result<GoalDto>.Ok(goalDto);
     }
 
 
-    public async Task<Result<GoalDto>> DeleteAsync(int id)
+    public async Task<Result> DeleteAsync(int id)
     {
-        var goal = await _unitOfWork.Goals.GetByIdAsync(id);
-        if (goal == null)
+        var goal = await _unitOfWork.Goals.ExistsAsync(id);
+
+        if (!goal)
         {
             return Result<GoalDto>.Fail("Goal not found.");
         }
@@ -99,7 +112,6 @@ public class GoalService : IGoalService
         await _unitOfWork.Goals.DeleteAsync(id);
         await _unitOfWork.SaveChangesAsync();
 
-        var goalDto = _mapper.Map<GoalDto>(goal);
-        return Result<GoalDto>.Ok(goalDto);
+        return Result.Ok();
     }
 }

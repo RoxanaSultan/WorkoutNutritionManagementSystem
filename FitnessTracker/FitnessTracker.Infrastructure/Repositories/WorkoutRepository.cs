@@ -68,4 +68,26 @@ public class WorkoutRepository : GenericRepository<Workout>, IWorkoutRepository
         _context.WorkoutExercises.Remove(entity);
         await _context.SaveChangesAsync();
     }
+
+    public async Task<List<int>> GetWorkoutIdsByUserIdAsync(int userId)
+    {
+        return await _context.Workouts
+            .Where(w => w.UserId == userId)
+            .Select(w => w.Id)
+            .ToListAsync();
+    }
+
+    public async Task DeleteByUserIdAsync(int userId)
+    {
+        await _context.Workouts
+            .Where(w => w.UserId == userId)
+            .ExecuteDeleteAsync();
+    }
+
+    public async Task DeleteByWorkoutIdsAsync(IEnumerable<int> workoutIds)
+    {
+        await _context.WorkoutExercises
+            .Where(we => workoutIds.Contains(we.WorkoutId))
+            .ExecuteDeleteAsync();
+    }
 }

@@ -9,5 +9,5 @@ public interface IFoodLogService
     Task<Result<FoodLogDto>> GetByIdAsync(int id);
     Task<Result<FoodLogDto>> CreateAsync(CreateFoodLogDto createDto);
     Task<Result<FoodLogDto>> UpdateAsync(int id, UpdateFoodLogDto updateDto);
-    Task<Result<FoodLogDto>> DeleteAsync(int id);
+    Task<Result> DeleteAsync(int id);
 }

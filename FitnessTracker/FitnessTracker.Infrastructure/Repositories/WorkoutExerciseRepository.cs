@@ -38,4 +38,11 @@ public class WorkoutExerciseRepository : GenericRepository<WorkoutExercise>, IWo
             .AsNoTracking()
             .AnyAsync(we => we.WorkoutId == workoutId && we.ExerciseId == exerciseId);
     }
+
+    public async Task DeleteByWorkoutIdsAsync(IEnumerable<int> workoutIds)
+    {
+        await _context.WorkoutExercises
+            .Where(we => workoutIds.Contains(we.WorkoutId))
+            .ExecuteDeleteAsync();
+    }
 }

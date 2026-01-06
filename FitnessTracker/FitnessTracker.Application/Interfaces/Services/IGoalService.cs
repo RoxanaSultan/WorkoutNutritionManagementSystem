@@ -9,5 +9,5 @@ public interface IGoalService
     Task<Result<GoalDto>> GetByIdAsync(int id);
     Task<Result<GoalDto>> CreateAsync(CreateGoalDto createGoalDto);
     Task<Result<GoalDto>> UpdateAsync(int id, UpdateGoalDto updateGoalDto);
-    Task<Result<GoalDto>> DeleteAsync(int id);
+    Task<Result> DeleteAsync(int id);
 }

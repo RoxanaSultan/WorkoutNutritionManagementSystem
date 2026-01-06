@@ -10,7 +10,7 @@ public interface IWorkoutService
     Task<Result<WorkoutDto>> GetByIdAsync(int id);
     Task<Result<WorkoutDto>> CreateAsync(CreateWorkoutDto createWorkoutDto);
     Task<Result<WorkoutDto>> UpdateAsync(int id, UpdateWorkoutDto updateWorkoutDto);
-    Task<Result<WorkoutDto>> DeleteAsync(int id);
+    Task<Result> DeleteAsync(int id);
 
     Task<Result<IEnumerable<WorkoutExerciseDto>>> GetExercisesByWorkout(int workoutId);
     Task<Result> AddExerciseAsync(int workoutId, CreateWorkoutExerciseDto dto);
