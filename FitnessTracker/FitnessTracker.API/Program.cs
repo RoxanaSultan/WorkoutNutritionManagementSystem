@@ -85,26 +85,6 @@ var app = builder.Build();
 
 app.UseMiddleware<ExceptionMiddleware>();
 
-//app.UseExceptionHandler(errorApp =>
-//{
-//    errorApp.Run(async context =>
-//    {
-//        var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
-
-//        var exceptionHandlerPathFeature =
-//            context.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerPathFeature>();
-
-//        if (exceptionHandlerPathFeature?.Error != null)
-//        {
-//            logger.LogError(exceptionHandlerPathFeature.Error,
-//                "Unhandled exception on path {Path}", exceptionHandlerPathFeature.Path);
-//        }
-
-//        context.Response.StatusCode = 500;
-//        await context.Response.WriteAsJsonAsync(new { message = "Internal server error" });
-//    });
-//});
-
 app.Use(async (context, next) =>
 {
     var logger = context.RequestServices.GetRequiredService<ILoggerFactory>()
