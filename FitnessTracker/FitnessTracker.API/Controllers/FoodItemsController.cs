@@ -1,4 +1,5 @@
-﻿using FitnessTracker.Application.DTOs.FoodItem;
+﻿using FitnessTracker.Application.Common;
+using FitnessTracker.Application.DTOs.FoodItem;
 using FitnessTracker.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -30,7 +31,7 @@ public class FoodItemsController : ControllerBase
 
         if (!result.Success)
         {
-            if (result.Error == "Food item not found.")
+            if (result.Error == ErrorMessages.FoodItemNotFound)
                 return NotFound(result.Error);
 
             return BadRequest(result.Error);
@@ -56,7 +57,7 @@ public class FoodItemsController : ControllerBase
 
         if (!result.Success)
         {
-            if (result.Error == "Food item not found.")
+            if (result.Error == ErrorMessages.FoodItemNotFound)
                 return NotFound(result.Error);
 
             return BadRequest(result.Error);
@@ -72,7 +73,7 @@ public class FoodItemsController : ControllerBase
 
         if (!result.Success)
         {
-            if (result.Error == "Food item not found.")
+            if (result.Error == ErrorMessages.FoodItemNotFound)
                 return NotFound(result.Error);
 
             return BadRequest(result.Error);

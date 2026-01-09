@@ -1,4 +1,5 @@
-﻿using FitnessTracker.Application.DTOs.Exercise;
+﻿using FitnessTracker.Application.Common;
+using FitnessTracker.Application.DTOs.Exercise;
 using FitnessTracker.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -29,7 +30,10 @@ public class ExercisesController : ControllerBase
         var result = await _service.GetByIdAsync(id);
         if (!result.Success)
         {
-            if (result.Error == "Exercise not found.") return NotFound(result.Error);
+            if (result.Error == ErrorMessages.ExerciseNotFound)
+            {
+                return NotFound(result.Error);
+            }
             return BadRequest(result.Error);
         }
         return Ok(result.Data);
@@ -51,7 +55,10 @@ public class ExercisesController : ControllerBase
         var result = await _service.UpdateAsync(id, dto);
         if (!result.Success)
         {
-            if (result.Error == "Exercise not found.") return NotFound(result.Error);
+            if (result.Error == ErrorMessages.ExerciseNotFound)
+            {
+                return NotFound(result.Error);
+            }
             return BadRequest(result.Error);
         }
         return Ok(result.Data);
@@ -63,7 +70,10 @@ public class ExercisesController : ControllerBase
         var result = await _service.DeleteAsync(id);
         if (!result.Success)
         {
-            if (result.Error == "Exercise not found.") return NotFound(result.Error);
+            if (result.Error == ErrorMessages.ExerciseNotFound)
+            {
+                return NotFound(result.Error);
+            }
             return BadRequest(result.Error);
         }
         return NoContent();

@@ -51,7 +51,6 @@ public class GoalService : IGoalService
         if (user == null)
         {
             return Result<GoalDto>.Fail(ErrorMessages.UserWithIdNotFound(createGoalDto.UserId));
-            // sau, fără id: return Result<GoalDto>.Fail(ErrorMessages.UserNotFound);
         }
 
         var validation = await _goalServiceValidator.ValidateCreateAsync(user, createGoalDto);

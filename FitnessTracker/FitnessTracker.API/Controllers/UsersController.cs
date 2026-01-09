@@ -1,4 +1,5 @@
-﻿using FitnessTracker.Application.DTOs.User;
+﻿using FitnessTracker.Application.Common;
+using FitnessTracker.Application.DTOs.User;
 using FitnessTracker.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -47,7 +48,7 @@ namespace FitnessTracker.API.Controllers
 
             if (!result.Success)
             {
-                if (result.Error == "User not found.")
+                if (result.Error == ErrorMessages.UserNotFound)
                 {
                     return NotFound(result.Error);
                 }
@@ -68,7 +69,7 @@ namespace FitnessTracker.API.Controllers
 
             if (!result.Success)
             {
-                if (result.Error == "User not found.")
+                if (result.Error == ErrorMessages.UserNotFound)
                 {
                     _logger.LogWarning("Cannot update user id={UserId} – not found", id);
                     return NotFound(result.Error);
@@ -121,7 +122,7 @@ namespace FitnessTracker.API.Controllers
 
             if (!result.Success)
             {
-                if (result.Error == "User not found.")
+                if (result.Error == ErrorMessages.UserNotFound)
                 {
                     _logger.LogWarning("Cannot delete user id={UserId} – not found", id);
                     return NotFound(result.Error);

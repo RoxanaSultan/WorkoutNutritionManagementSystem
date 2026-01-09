@@ -1,4 +1,5 @@
-﻿using FitnessTracker.Application.DTOs.Goal;
+﻿using FitnessTracker.Application.Common;
+using FitnessTracker.Application.DTOs.Goal;
 using FitnessTracker.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -36,7 +37,7 @@ public class GoalsController : ControllerBase
 
         if (!result.Success)
         {
-            if (result.Error == "Goal not found.")
+            if (result.Error == ErrorMessages.GoalNotFound)
             {
                 return NotFound(result.Error);
             }
@@ -55,7 +56,7 @@ public class GoalsController : ControllerBase
         var result = await _goalService.UpdateAsync(id, updateGoalDto);
         if (!result.Success)
         {
-            if (result.Error == "Goal not found.")
+            if (result.Error == ErrorMessages.GoalNotFound)
             {
                 return NotFound(result.Error);
             }
@@ -93,7 +94,7 @@ public class GoalsController : ControllerBase
         var result = await _goalService.DeleteAsync(id);
         if (!result.Success)
         {
-            if (result.Error == "Goal not found.")
+            if (result.Error == ErrorMessages.GoalNotFound)
             {
                 return NotFound(result.Error);
             }

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FitnessTracker.Application.Common;
 using FitnessTracker.Application.DTOs.WorkoutExercise;
 using FitnessTracker.Application.Interfaces.Repositories;
 using FitnessTracker.Application.Interfaces.Services;
@@ -34,7 +35,7 @@ public class WorkoutExerciseService : IWorkoutExerciseService
     {
         var entity = await _unitOfWork.WorkoutExercises.GetByIdAsync(workoutId, exerciseId);
         if (entity == null)
-            return Result<WorkoutExerciseDto>.Fail("WorkoutExercise not found.");
+            return Result<WorkoutExerciseDto>.Fail(ErrorMessages.WorkoutExerciseNotFound);
 
         return Result<WorkoutExerciseDto>.Ok(_mapper.Map<WorkoutExerciseDto>(entity));
     }
@@ -56,7 +57,7 @@ public class WorkoutExerciseService : IWorkoutExerciseService
     {
         var existing = await _unitOfWork.WorkoutExercises.GetByIdAsync(workoutId, exerciseId);
         if (existing == null)
-            return Result<WorkoutExerciseDto>.Fail("WorkoutExercise not found.");
+            return Result<WorkoutExerciseDto>.Fail(ErrorMessages.WorkoutExerciseNotFound);
 
         _mapper.Map(dto, existing);
         await _unitOfWork.WorkoutExercises.UpdateAsync(existing);
@@ -69,7 +70,7 @@ public class WorkoutExerciseService : IWorkoutExerciseService
     {
         var existing = await _unitOfWork.WorkoutExercises.GetByIdAsync(workoutId, exerciseId);
         if (existing == null)
-            return Result<WorkoutExerciseDto>.Fail("WorkoutExercise not found.");
+            return Result<WorkoutExerciseDto>.Fail(ErrorMessages.WorkoutExerciseNotFound);
 
         await _unitOfWork.WorkoutExercises.DeleteAsync(workoutId, exerciseId);
         await _unitOfWork.SaveChangesAsync();

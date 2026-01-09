@@ -1,4 +1,5 @@
-﻿using FitnessTracker.Application.DTOs.Workout;
+﻿using FitnessTracker.Application.Common;
+using FitnessTracker.Application.DTOs.Workout;
 using FitnessTracker.Application.DTOs.WorkoutExercise;
 using FitnessTracker.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -48,7 +49,7 @@ public class WorkoutsController : ControllerBase
 
         if (!result.Success)
         {
-            if (result.Error == "Workout not found.")
+            if (result.Error == ErrorMessages.WorkoutNotFound)
             {
                 _logger.LogWarning("Workout id={WorkoutId} not found", id);
                 return NotFound(result.Error);
@@ -93,7 +94,7 @@ public class WorkoutsController : ControllerBase
 
         if (!result.Success)
         {
-            if (result.Error == "Workout not found.")
+            if (result.Error == ErrorMessages.WorkoutNotFound)
             {
                 _logger.LogWarning("Cannot update workout id={WorkoutId} – not found", id);
                 return NotFound(result.Error);
@@ -116,7 +117,7 @@ public class WorkoutsController : ControllerBase
 
         if (!result.Success)
         {
-            if (result.Error == "Workout not found.")
+            if (result.Error == ErrorMessages.WorkoutNotFound)
             {
                 _logger.LogWarning("Cannot delete workout id={WorkoutId} – not found", id);
                 return NotFound(result.Error);

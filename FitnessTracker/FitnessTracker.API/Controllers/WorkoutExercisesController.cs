@@ -1,4 +1,5 @@
-﻿using FitnessTracker.Application.DTOs.WorkoutExercise;
+﻿using FitnessTracker.Application.Common;
+using FitnessTracker.Application.DTOs.WorkoutExercise;
 using FitnessTracker.Application.Interfaces.Services;
 using FitnessTracker.Application.Services;
 using FitnessTracker.Domain.Entities;
@@ -24,8 +25,6 @@ namespace FitnessTracker.API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<WorkoutExercise>>> GetWorkoutExercises()
         {
-            //return await _workoutExerciseService.WorkoutExercises.ToListAsync();
-
             var result = await _workoutExerciseService.GetAllAsync();
 
             if (!result.Success)
@@ -44,7 +43,7 @@ namespace FitnessTracker.API.Controllers
 
             if (!result.Success)
             {
-                if (result.Error == "WorkoutExercise not found.")
+                if (result.Error == ErrorMessages.WorkoutExerciseNotFound)
                 {
                     return NotFound(result.Error);
                 }
@@ -64,7 +63,7 @@ namespace FitnessTracker.API.Controllers
 
             if (!result.Success)
             {
-                if (result.Error == "WorkoutExercise not found.")
+                if (result.Error == ErrorMessages.WorkoutExerciseNotFound)
                 {
                     return NotFound(result.Error);
                 }
@@ -100,7 +99,7 @@ namespace FitnessTracker.API.Controllers
 
             if (!result.Success)
             {
-                if (result.Error == "Workout not found.")
+                if (result.Error == ErrorMessages.WorkoutExerciseNotFound)
                 {
                     return NotFound(result.Error);
                 }

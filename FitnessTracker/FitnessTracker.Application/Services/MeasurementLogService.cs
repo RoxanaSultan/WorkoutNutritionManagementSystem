@@ -54,7 +54,6 @@ public class MeasurementLogService : IMeasurementLogService
         if (user == null)
         {
             return Result<MeasurementLogDto>.Fail(ErrorMessages.UserWithIdNotFound(createMeasurementLogDto.UserId));
-            // sau fără id: return Result<MeasurementLogDto>.Fail(ErrorMessages.UserNotFound);
         }
 
         var measurementLog = _mapper.Map<MeasurementLog>(createMeasurementLogDto);

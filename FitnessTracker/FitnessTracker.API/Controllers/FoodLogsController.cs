@@ -1,4 +1,5 @@
-﻿using FitnessTracker.Application.DTOs.FoodLog;
+﻿using FitnessTracker.Application.Common;
+using FitnessTracker.Application.DTOs.FoodLog;
 using FitnessTracker.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -35,7 +36,7 @@ public class FoodLogsController : ControllerBase
         var result = await _foodLogService.GetByIdAsync(id);
         if (!result.Success)
         {
-            if (result.Error == "Food log not found.")
+            if (result.Error == ErrorMessages.FoodLogNotFound)
             {
                 return NotFound(result.Error);
             }
@@ -72,7 +73,7 @@ public class FoodLogsController : ControllerBase
 
         if (!result.Success)
         {
-            if (result.Error == "Food log not found.")
+            if (result.Error == ErrorMessages.FoodLogNotFound)
             {
                 return NotFound(result.Error);
             }
@@ -91,7 +92,7 @@ public class FoodLogsController : ControllerBase
 
         if (!result.Success)
         {
-            if (result.Error == "Food log not found.")
+            if (result.Error == ErrorMessages.FoodLogNotFound)
             {
                 return NotFound(result.Error);
             }

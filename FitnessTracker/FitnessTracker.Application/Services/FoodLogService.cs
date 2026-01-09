@@ -53,11 +53,7 @@ public class FoodLogService : IFoodLogService
 
         if (user == null)
         {
-            // varianta cu id (dacă adaugi metoda statică în ErrorMessages)
             return Result<FoodLogDto>.Fail(ErrorMessages.UserWithIdNotFound(createFoodLogDto.UserId));
-
-            // sau, dacă vrei fără id:
-            // return Result<FoodLogDto>.Fail(ErrorMessages.UserNotFound);
         }
 
         var validation = await _foodLogServiceValidator.ValidateCreateAsync(user, createFoodLogDto);

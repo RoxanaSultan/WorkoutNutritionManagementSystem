@@ -84,7 +84,6 @@ public static class ErrorMessages
 
     // Workout
     public const string WorkoutNotFound = "Workout not found.";
-    public const string WorkoutExerciseNotFound = "Workout exercise not found.";
     public const string WorkoutExerciseAlreadyAdded = "This exercise is already added to the workout.";
     public const string WorkoutDateBeforeUserRegistration =
         "Workout date must be greater than or equal to user's registration date.";
@@ -96,4 +95,10 @@ public static class ErrorMessages
     public const string WorkoutDurationPositive = "Duration must be a positive number.";
     public const string WorkoutDurationRange = "Duration must be between 5 and 300 minutes.";
     public const string WorkoutNotesMaxLength500 = "Notes cannot exceed 500 characters.";
+
+    // Workout Exercise
+    public const string WorkoutExerciseNotFound = "Workout exercise not found.";
+    public const string WorkoutExerciseSetsPositive = "Sets must be a positive value.";
+    public const string WorkoutExerciseRepsPositive = "Reps must be a positive value.";
+    public const string WorkoutExerciseWeightUsedNonNegative = "WeightUsed cannot be negative.";
 }
