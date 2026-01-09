@@ -16,10 +16,7 @@ public class WorkoutService : IWorkoutService
     private readonly IMapper _mapper;
     private readonly IWorkoutServiceValidator _validator;
 
-    public WorkoutService(
-        IUnitOfWork unitOfWork,
-        IMapper mapper,
-        IWorkoutServiceValidator validator)
+    public WorkoutService(IUnitOfWork unitOfWork, IMapper mapper, IWorkoutServiceValidator validator)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
@@ -37,32 +34,31 @@ public class WorkoutService : IWorkoutService
     public async Task<Result<WorkoutDto>> GetByIdAsync(int id)
     {
         var workout = await _unitOfWork.Workouts.GetByIdAsync(id);
-
         if (workout == null)
         {
             return Result<WorkoutDto>.Fail(ErrorMessages.WorkoutNotFound);
         }
 
-        return Result<WorkoutDto>.Ok(_mapper.Map<WorkoutDto>(workout));
+        var workoutDto = _mapper.Map<WorkoutDto>(workout);
+        return Result<WorkoutDto>.Ok(workoutDto);
     }
 
     public async Task<Result<WorkoutDto>> CreateAsync(CreateWorkoutDto createWorkoutDto)
     {
         var user = await _unitOfWork.Users.GetByIdAsync(createWorkoutDto.UserId);
-
         if (user == null)
         {
             return Result<WorkoutDto>.Fail(ErrorMessages.UserWithIdNotFound(createWorkoutDto.UserId));
         }
 
         var validation = await _validator.ValidateCreateAsync(user, createWorkoutDto);
-
         if (!validation.Success)
         {
             return Result<WorkoutDto>.Fail(validation.Error);
         }
 
         var workout = _mapper.Map<Workout>(createWorkoutDto);
+
         await _unitOfWork.Workouts.CreateAsync(workout);
         await _unitOfWork.SaveChangesAsync();
 
@@ -103,15 +99,14 @@ public class WorkoutService : IWorkoutService
 
     public async Task<Result> DeleteAsync(int id)
     {
-        var exists = await _unitOfWork.Workouts.ExistsAsync(id);
-        if (!exists)
+        var workout = await _unitOfWork.Workouts.ExistsAsync(id);
+        if (!workout)
         {
             return Result.Fail(ErrorMessages.WorkoutNotFound);
         }
 
-        await _unitOfWork.Workouts.DeleteByWorkoutIdsAsync(new[] { id });
+        await _unitOfWork.Workouts.DeleteByWorkoutIdsAsync([id]);
         await _unitOfWork.Workouts.DeleteAsync(id);
-
         await _unitOfWork.SaveChangesAsync();
 
         return Result.Ok();
