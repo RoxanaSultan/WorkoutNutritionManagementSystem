@@ -18,9 +18,10 @@ public class ExerciseServiceValidator : IExerciseServiceValidator
     public async Task<Result> ValidateCreateAsync(CreateExerciseDto dto)
     {
         var name = dto.Name;
-
         if (string.IsNullOrWhiteSpace(name))
+        {
             return Result.Fail(ErrorMessages.ExerciseNameRequired);
+        }
 
         var exists = await _exerciseRepository.ExistsByNameAsync(name);
         if (exists)
@@ -34,9 +35,10 @@ public class ExerciseServiceValidator : IExerciseServiceValidator
     public async Task<Result> ValidateUpdateAsync(int id, UpdateExerciseDto dto)
     {
         var name = dto.Name;
-
         if (string.IsNullOrWhiteSpace(name))
+        {
             return Result.Fail(ErrorMessages.ExerciseNameRequired);
+        }
 
         var exists = await _exerciseRepository.ExistsByNameAsync(name, ignoreExerciseId: id);
         if (exists)
