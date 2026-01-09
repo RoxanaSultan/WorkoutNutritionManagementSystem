@@ -150,42 +150,4 @@ public class WorkoutsController : ControllerBase
 
         return Ok(result.Data);
     }
-
-    [HttpPost("{workoutId}/exercises")]
-    public async Task<IActionResult> AddExercise(int workoutId, CreateWorkoutExerciseDto dto)
-    {
-        var result = await _workoutService.AddExerciseAsync(workoutId, dto);
-        if (!result.Success) return BadRequest(result.Error);
-        return Ok();
-    }
-
-    [HttpPut("{workoutId}/exercises/{exerciseId}")]
-    public async Task<IActionResult> UpdateExercise(int workoutId, int exerciseId, UpdateWorkoutExerciseDto dto)
-    {
-        var result = await _workoutService.UpdateExerciseAsync(workoutId, exerciseId, dto);
-        if (!result.Success)
-        {
-            if (result.Error == "Workout exercise not found.")
-                return NotFound(result.Error);
-
-            return BadRequest(result.Error);
-        }
-
-        return Ok();
-    }
-
-    [HttpDelete("{workoutId}/exercises/{exerciseId}")]
-    public async Task<IActionResult> RemoveExercise(int workoutId, int exerciseId)
-    {
-        var result = await _workoutService.RemoveExerciseAsync(workoutId, exerciseId);
-        if (!result.Success)
-        {
-            if (result.Error == "Workout exercise not found.")
-                return NotFound(result.Error);
-
-            return BadRequest(result.Error);
-        }
-
-        return NoContent();
-    }
 }
