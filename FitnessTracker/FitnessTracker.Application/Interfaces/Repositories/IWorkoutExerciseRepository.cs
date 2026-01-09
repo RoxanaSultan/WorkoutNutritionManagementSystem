@@ -8,4 +8,5 @@ public interface IWorkoutExerciseRepository : IGenericRepository<WorkoutExercise
     Task DeleteAsync(int workoutId, int exerciseId);
     Task<bool> ExistsAsync(int workoutId, int exerciseId);
     Task DeleteByWorkoutIdsAsync(IEnumerable<int> workoutIds);
+    Task DeleteByExerciseIdsAsync(IEnumerable<int> exerciseIds);
 }

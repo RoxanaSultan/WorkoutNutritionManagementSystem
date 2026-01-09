@@ -45,6 +45,9 @@ builder.Services.AddScoped<IFoodItemService, FoodItemService>();
 builder.Services.AddScoped<IWorkoutRepository, WorkoutRepository>();
 builder.Services.AddScoped<IWorkoutService, WorkoutService>();
 
+builder.Services.AddScoped<IWorkoutExerciseRepository, WorkoutExerciseRepository>();
+builder.Services.AddScoped<IWorkoutExerciseService, WorkoutExerciseService>();
+
 builder.Services.AddScoped<IFoodLogRepository, FoodLogRepository>();
 builder.Services.AddScoped<IFoodLogService, FoodLogService>();
 
@@ -59,6 +62,7 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IUserServiceValidator, UserServiceValidator>();
 builder.Services.AddScoped<IGoalServiceValidator, GoalServiceValidator>();
 builder.Services.AddScoped<IWorkoutServiceValidator, WorkoutServiceValidator>();
+builder.Services.AddScoped<IWorkoutExerciseServiceValidator, WorkoutExerciseServiceValidator>();
 builder.Services.AddScoped<IExerciseServiceValidator, ExerciseServiceValidator>();
 builder.Services.AddScoped<IFoodItemServiceValidator, FoodItemServiceValidator>();
 builder.Services.AddScoped<IFoodLogServiceValidator, FoodLogServiceValidator>();

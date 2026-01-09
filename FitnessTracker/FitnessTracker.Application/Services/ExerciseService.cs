@@ -105,6 +105,7 @@ public class ExerciseService : IExerciseService
             return Result.Fail(validation.Error);
         }
 
+        await _unitOfWork.WorkoutExercises.DeleteByExerciseIdsAsync([id]);
         await _unitOfWork.Exercises.DeleteAsync(id);
         await _unitOfWork.SaveChangesAsync();
 

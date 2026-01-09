@@ -109,10 +109,7 @@ public class WorkoutService : IWorkoutService
             return Result.Fail(ErrorMessages.WorkoutNotFound);
         }
 
-        // Presupunere: metoda asta șterge workout-exercises pentru workoutId-urile date.
         await _unitOfWork.Workouts.DeleteByWorkoutIdsAsync(new[] { id });
-
-        // Șterge workout-ul
         await _unitOfWork.Workouts.DeleteAsync(id);
 
         await _unitOfWork.SaveChangesAsync();
@@ -122,7 +119,6 @@ public class WorkoutService : IWorkoutService
 
     public async Task<Result<IEnumerable<WorkoutExerciseDto>>> GetExercisesByWorkout(int workoutId)
     {
-        // FIX: era _unitOfWork.Exercises.GetByIdAsync(workoutId)
         var workout = await _unitOfWork.Workouts.GetByIdAsync(workoutId);
         if (workout == null)
         {

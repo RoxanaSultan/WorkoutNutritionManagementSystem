@@ -17,6 +17,7 @@ public sealed class UnitOfWork(
     private MeasurementLogRepository? _measurementLogs;
     private UserRepository? _users;
     private WorkoutRepository? _workouts;
+    private WorkoutExerciseRepository? _workoutExercises;
 
     public IExerciseRepository Exercises => _exercises ??= new ExerciseRepository(_context);
     public IFoodItemRepository FoodItems => _foodItems ??= new FoodItemRepository(_context);
@@ -25,6 +26,7 @@ public sealed class UnitOfWork(
     public IMeasurementLogRepository MeasurementLogs => _measurementLogs ??= new MeasurementLogRepository(_context);
     public IUserRepository Users => _users ??= new UserRepository(_context);
     public IWorkoutRepository Workouts => _workouts ??= new WorkoutRepository(_context);
+    public IWorkoutExerciseRepository WorkoutExercises => _workoutExercises ??= new WorkoutExerciseRepository(_context);
 
     public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {

@@ -45,4 +45,11 @@ public class WorkoutExerciseRepository : GenericRepository<WorkoutExercise>, IWo
             .Where(we => workoutIds.Contains(we.WorkoutId))
             .ExecuteDeleteAsync();
     }
+
+    public async Task DeleteByExerciseIdsAsync(IEnumerable<int> exerciseIds)
+    {
+        await _context.WorkoutExercises
+            .Where(we => exerciseIds.Contains(we.ExerciseId))
+            .ExecuteDeleteAsync();
+    }
 }

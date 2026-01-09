@@ -24,7 +24,9 @@ public class ExerciseServiceValidator : IExerciseServiceValidator
 
         var exists = await _exerciseRepository.ExistsByNameAsync(name);
         if (exists)
+        {
             return Result.Fail(ErrorMessages.ExerciseNameAlreadyExists);
+        }
 
         return Result.Ok();
     }
@@ -38,7 +40,9 @@ public class ExerciseServiceValidator : IExerciseServiceValidator
 
         var exists = await _exerciseRepository.ExistsByNameAsync(name, ignoreExerciseId: id);
         if (exists)
+        {
             return Result.Fail(ErrorMessages.ExerciseNameAlreadyExists);
+        }
 
         return Result.Ok();
     }
@@ -47,7 +51,9 @@ public class ExerciseServiceValidator : IExerciseServiceValidator
     {
         var usedInPast = await _exerciseRepository.IsUsedInPastWorkoutsAsync(id, DateTime.UtcNow);
         if (usedInPast)
+        {
             return Result.Fail(ErrorMessages.ExerciseCannotDeleteUsedInPastWorkouts);
+        }
 
         return Result.Ok();
     }
